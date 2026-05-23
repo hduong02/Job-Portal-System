@@ -1,9 +1,9 @@
 server:
-  port: 5001
+  port: 5002
 
 spring:
   application:
-    name: job-portal-user-service
+    name: job-portal-company-service
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,7 +15,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     
   datasource:
-    url: jdbc:postgresql://localhost:5432/job_portal_user
+    url: jdbc:postgresql://localhost:5432/job_portal_company
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
