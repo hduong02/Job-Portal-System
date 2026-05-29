@@ -8,11 +8,11 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>job-portal-company-service</artifactId>
-	
-	<name>job-portal-company-service</name>
-	<description>Service for managing company profiles</description>
+	<artifactId>job-portal-job-service</artifactId>
 
+	<name>Job-portal-job-service</name>
+	<description>Service for managing job postings, search and filtering</description>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.example</groupId>
