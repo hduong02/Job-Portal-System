@@ -8,7 +8,12 @@ import com.example.domain.ApplicationStatus;
 import com.example.dto.response.ApplicationResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
+import com.example.dto.response.ResumeResponse;
 import com.example.dto.response.UserResponse;
+import com.example.job_portal_application_service.client.CompanyClient;
+import com.example.job_portal_application_service.client.JobClient;
+import com.example.job_portal_application_service.client.ResumeClient;
+import com.example.job_portal_application_service.client.UserClient;
 import com.example.job_portal_application_service.mapper.ApplicationMapper;
 import com.example.job_portal_application_service.model.Application;
 import com.example.job_portal_application_service.model.ApplicationNote;
@@ -28,6 +33,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
+    private final JobClient jobClient;
+    private final ResumeClient resumeClient;
+    private final CompanyClient companyClient;
+    private final UserClient userClient;
 
     @Override
     public ApplicationResponse createApplication(Long candidateId,
@@ -38,15 +47,20 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new Exception("You have already applied");
         }
 
-        // TODO: fetch real data
-        Long companyId = 1L;
-        Long employeeId = 1L;
+        JobResponse job = jobClient.getJobById(req.getJobId());
+        Long companyId = job.getCompany().getId();
+        Long employerId = job.getEmployerId();
+
+        ResumeResponse resume = resumeClient.getResumeById(
+                req.getResumeId(),
+                candidateId
+        );
 
         Application application = ApplicationMapper.toEntity(
                 req,
                 candidateId,
                 companyId,
-                employeeId
+                employerId
         );
 
         Application savedApplication = applicationRepository.save(application);
@@ -80,9 +94,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     public List<ApplicationResponse> getApplicationsForCompany(Long userId,
             CompanyApplicationFilterRequest filter) {
 
-        // TODO: fetch company by ownerId
-        Long companyId = 1L;
-
+        Long companyId = companyClient.getMyCompany(userId).getId();
         Sort sort = buildSort(filter.getSortBy());
 
         return applicationRepository.findAll(
@@ -163,16 +175,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     // ====================== Helper functions ======================
 
     private ApplicationResponse buildFullResponse(Application application) {
-        // TODO: fetch real data from respective microservice
-        JobResponse job = JobResponse.builder()
-                .id(application.getJobId())
-                .build();
-        CompanyResponse company = CompanyResponse.builder()
-                .id(application.getCompanyId())
-                .build();
-        UserResponse candidate = UserResponse.builder()
-                .id(application.getCandidateId())
-                .build();
+        JobResponse job = jobClient.getJobById(application.getJobId());
+        CompanyResponse company = companyClient.getCompanyById(application.getCompanyId());
+        UserResponse candidate = userClient.getUserById(application.getCandidateId());
+
         List<ApplicationNote> notes = applicationNoteRepository
                 .findByApplicationId(application.getId());
 

@@ -8,6 +8,7 @@ import com.example.domain.JobStatus;
 import com.example.dto.request.JobRequest;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
+import com.example.job_portal_job_service.client.CompanyClient;
 import com.example.job_portal_job_service.mapper.JobMapper;
 import com.example.job_portal_job_service.model.Job;
 import com.example.job_portal_job_service.model.JobCategory;
@@ -38,6 +39,7 @@ public class JobServiceImpl implements JobService {
     private final JobCategoryService categoryService;
     private final JobSkillService skillService;
     private final JobTagService tagService;
+    private final CompanyClient companyClient;
 
     @Override
     public JobResponse createJob(Long employerId, JobRequest req) throws Exception {
@@ -52,7 +54,9 @@ public class JobServiceImpl implements JobService {
                 tagService.getTagsByIds(req.getTagIds())
                 : Collections.emptySet();
 
-        Long companyId = 1L;
+        CompanyResponse company = companyClient.getMyCompany(employerId);
+
+        Long companyId = company.getId();
 
         Job job = Job.builder()
                 .title(req.getTitle())
@@ -186,9 +190,8 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobResponse convertToResponse(Job savedJob) {
-        CompanyResponse companyResponse = CompanyResponse.builder()
-        .id(savedJob.getCompanyId())
-        .build();
+        CompanyResponse companyResponse = companyClient.getCompanyById(
+                savedJob.getEmployerId());
         
         return JobMapper.toResponse(savedJob, companyResponse);
     }

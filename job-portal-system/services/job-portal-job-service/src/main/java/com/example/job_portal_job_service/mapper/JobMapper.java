@@ -36,6 +36,7 @@ public class JobMapper {
                 .requirements(job.getRequirements())
                 .responsibilities(job.getResponsibilities())
                 .benefits(job.getBenefits())
+                .employerId(job.getEmployerId())
                 .company(companyResponse)
                 .category(JobCategoryMapper.toJobCategoryResponse(job.getCategory(), false))
                 .skills(skills)
