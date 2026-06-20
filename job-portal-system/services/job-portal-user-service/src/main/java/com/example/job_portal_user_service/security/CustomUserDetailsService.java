@@ -18,7 +18,6 @@ import java.util.Collections;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-
     private final UserRepository userRepository;
 
     @Override
@@ -26,8 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByEmail(username);
 
-        if(user == null) {
-            throw new UsernameNotFoundException("user not found "+ username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found " + username);
         }
 
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().toString());
