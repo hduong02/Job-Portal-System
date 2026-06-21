@@ -3,4 +3,4 @@ spring:
     name: job-portal-preference-service
 
   config:
-    import: configserver:http://localhost:8888
+    import: optional:configserver:http://localhost:8888
