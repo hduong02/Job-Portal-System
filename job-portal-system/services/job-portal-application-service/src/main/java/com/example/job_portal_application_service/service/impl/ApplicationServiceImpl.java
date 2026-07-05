@@ -1,5 +1,6 @@
 package com.example.job_portal_application_service.service.impl;
 
+import com.example.job_portal_application_service.event.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final ApplicationRepository applicationRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
     private final JobClient jobClient;
@@ -118,6 +120,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             ApplicationStatus status) throws Exception {
 
         Application application = getApplicationEntity(applicationId);
+        ApplicationStatus oldStatus = application.getStatus();
         assertEmployer(application, employerId);
 
         if (application.getStatus() == ApplicationStatus.WITHDRAWN){
@@ -125,6 +128,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         application.setStatus(status);
         Application savedApplication = applicationRepository.save(application);
+
+        applicationEventPublisher.publishStatusChange(
+                savedApplication,
+                oldStatus,
+                status,
+                "Your application status has changed"
+        );
 
         return buildFullResponse(savedApplication);
     }

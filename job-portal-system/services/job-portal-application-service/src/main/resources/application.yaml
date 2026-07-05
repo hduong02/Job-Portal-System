@@ -3,3 +3,6 @@ spring:
     name: job-portal-application-service
   config:
     import: optional:configserver:http://localhost:8888
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

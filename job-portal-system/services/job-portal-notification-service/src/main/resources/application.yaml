@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: job-portal-notification-service
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:hoangduongvd99@gmail.com}
+    password: ${MAIL_PASSWORD:licd ygvc curk timg}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

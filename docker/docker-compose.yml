@@ -198,7 +198,7 @@ services:
   # Kafka SERVICES
   # ============================================================
   kafka:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.3.1
     container_name: job-portal-kafka-dev
     ports:
       - "9092:9092"
