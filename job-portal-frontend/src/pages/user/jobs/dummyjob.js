@@ -1,0 +1,98 @@
+export const job =
+  {
+    id: 1,
+    title: "Senior Java Backend Developer",
+    description:
+      "We are looking for a skilled backend developer to build scalable microservices using Spring Boot and Kafka.",
+    requirements:
+      "5+ years experience in Java, Spring Boot, Microservices, Docker, Kubernetes, Kafka",
+    responsibilities:
+      "Design APIs, build microservices, optimize performance, collaborate with frontend team",
+    benefits: "Health insurance, flexible working hours, remote work options",
+    company: {
+      id: 101,
+      name: "Meta Platforms, Inc.",
+      slug: "meta-platforms-inc",
+      logoUrl:
+        "https://cdn.pixabay.com/photo/2018/05/08/21/28/logo-3382058_1280.png",
+      tagline: "Building the future of connection and the metaverse",
+      industryType: "TECHNOLOGY",
+      companySize: "ENTERPRISE",
+      verified: true,
+    },
+    employerId: 2,
+    category: {
+      id: 1,
+      name: "Software Development",
+      slug: "software-development",
+      description:
+        "Jobs related to software engineering, backend, frontend, and full-stack development.",
+      iconUrl: "https://cdn.zenithtech.com/icons/software-development.png",
+      active: true,
+      createdAt: "2026-02-28T22:44:31.616396",
+    },
+    skills: [
+      {
+        id: 1,
+        name: "Spring Boot",
+        slug: "spring-boot",
+        category: "FRAMEWORK",
+        active: true,
+      },
+      {
+        id: 3,
+        name: "Fast API",
+        slug: "fast-api",
+        category: "FRAMEWORK",
+        active: true,
+      },
+      {
+        id: 2,
+        name: "React",
+        slug: "react",
+        category: "FRAMEWORK",
+        active: true,
+      },
+    ],
+    tags: [
+      {
+        id: 5,
+        name: "AI/ML",
+        slug: "aiml",
+      },
+      {
+        id: 1,
+        name: "urgent-hiring",
+        slug: "urgent-hiring",
+      },
+      {
+        id: 2,
+        name: "visa-sponsored",
+        slug: "visa-sponsored",
+      },
+    ],
+    address: "Raleigh IT Park",
+    city: "Raleigh",
+    state: "NC",
+    country: "USA",
+    zipCode: "27601",
+    minSalary: 130000,
+    maxSalary: 175000,
+    currency: "USD",
+    salaryPeriod: "YEARLY",
+    salaryNegotiable: true,
+    salaryDisclosed: true,
+    jobType: "FULL_TIME",
+    workMode: "HYBRID",
+    experienceLevel: "SENIOR_LEVEL",
+    status: "OPEN",
+    openings: 3,
+    applicationDeadline: "2026-03-31",
+    expiresAt: "2026-04-15",
+    active: true,
+    viewCount: 6,
+    applicationCount: 0,
+    createdAt: "2026-02-28T23:15:37.736102",
+    updatedAt: "2026-04-09T14:58:59.236868",
+    publishedAt: "2026-03-02T17:41:57.930648",
+  }
