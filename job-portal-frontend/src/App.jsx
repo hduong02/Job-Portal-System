@@ -13,6 +13,12 @@ import CreateJob from "./pages/employer/jobs/CreateJob";
 import EmployerApplications from "./pages/employer/applications/EmployerApplications";
 import AIScreening from "./pages/employer/aiScreening/AiScreening";
 import CompanyProfile from "./pages/employer/companyProfile/CompanyProfile";
+import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
+import AdminUsers from "./pages/admin/users/AdminUsers";
+import Companies from "./pages/admin/companies/Companies";
+import JobMetaData from "./pages/admin/jobMetaData/JobMetaData";
+import AdminProfile from "./pages/admin/settings/AdminProfile";
+import AdminLayout from "./pages/admin/layout/AdminLayout";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
@@ -41,6 +47,15 @@ function App() {
               <Route path="company" element={<CompanyProfile />} />
               {/*<Route path="/employer/jobs/:jobId/edit" element={<CreateJob isEdit={true} />} />*/}
           </Route>
+
+          <Route path="/admin" element={<AdminLayout />}>
+              <Route path="" element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="companies" element={<Companies />} />
+              <Route path="job-meta" element={<JobMetaData />} />
+              <Route path="settings" element={<AdminProfile />} />
+            </Route>
       </Routes>
     </div>
   );
