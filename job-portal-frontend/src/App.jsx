@@ -19,12 +19,19 @@ import Companies from "./pages/admin/companies/Companies";
 import JobMetaData from "./pages/admin/jobMetaData/JobMetaData";
 import AdminProfile from "./pages/admin/settings/AdminProfile";
 import AdminLayout from "./pages/admin/layout/AdminLayout";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
   return (
     <div>
       <Routes>
+          {/* auth routes */}
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
           {/* user routes */}
           <Route element={<UserLayout />}>
             <Route path="/" element={<Jobs />} />
