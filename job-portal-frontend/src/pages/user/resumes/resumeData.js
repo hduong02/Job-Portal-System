@@ -2,32 +2,32 @@ export const resumes=[
     {
         "id": 2,
         "candidateId": 3,
-        "title": "React Developer Resume",
-        "template": "MODERN",
+        "title": "React Developer  Resume",
+        "template": "CREATIVE",
         "visibility": "PUBLIC",
         "isDefault": true,
         "personalInfo": {
             "firstName": "Paul",
             "lastName": "Parker",
             "headline": "Sr Full Stack Developer",
-            "email": "paul.parker@gmail.com",
-            "phone": "+14155552671",
+            "email": "paul@gmail.com",
+            "phone": "+14155552783",
             "city": "Austin",
             "country": "United States",
-            "linkedinUrl": "https://linkedin.com/in/paulparker",
+            "linkedinUrl": "https://linkdin.com/in/paul",
             "githubUrl": "https://github.com/paulparker",
-            "portfolioUrl": "https://codewithvertex.com",
-            "websiteUrl": "https://codewithvertex.com"
+            "portfolioUrl": "https://codewithpaul.com",
+            "websiteUrl": "https://codewithpaul.com"
         },
         "summary": "Senior Full Stack Developer with a proven ability to design, develop, and deploy robust web applications. Successfully integrated CI/CD pipelines and Docker deployments on AWS, while mentoring junior developers to resolve complex errors. Proficient in React, Node.js, Java (Spring Boot), FastAPI, Angular, and PostgreSQL, eager to leverage full-stack expertise to drive innovation and deliver high-impact solutions.",
         "completionScore": 0,
         "active": true,
         "createdAt": "2026-03-02T13:44:49.847132",
-        "updatedAt": "2026-04-09T18:22:58.111259",
+        "updatedAt": "2026-06-26T18:09:33.914718",
         "workExperiences": [
             {
                 "id": 2,
-                "companyName": "Air Tech",
+                "companyName": "Sky Tech",
                 "companyLogoUrl": "https://cdn.pixabay.com/photo/2014/12/28/13/20/wordpress-581849_1280.jpg",
                 "jobTitle": "Sr Software Developer",
                 "employmentType": "FULL_TIME",
@@ -53,7 +53,7 @@ export const resumes=[
         "educations": [
             {
                 "id": 2,
-                "institutionName": "University of Michigan",
+                "institutionName": "Ohio State University",
                 "degree": "b s computer",
                 "fieldOfStudy": "computer since",
                 "grade": "",
@@ -126,26 +126,26 @@ export const resumes=[
         "isDefault": false,
         "personalInfo": {
             "firstName": "Paul ",
-            "lastName": "Peterson",
+            "lastName": "Parkerson",
             "headline": "Senior Softwere Engineer",
-            "email": "paul.peterson@gmail.com",
-            "phone": "9175552398",
+            "email": "paul@gmail.com",
+            "phone": "9023379136",
             "city": "Austin",
             "country": "United States",
-            "linkedinUrl": "https://linkedin.com/in/paul-peterson",
-            "githubUrl": "https://github.com/paulpeterson",
+            "linkedinUrl": "https://linkdin.com/in/paul-parkerson",
+            "githubUrl": "https://github.com/PaulParkerson",
             "portfolioUrl": "https://paul-portfolio.vercel.app/",
-            "websiteUrl": "https://codewithvertex.com"
+            "websiteUrl": "https://codewithpaul.com"
         },
         "summary": "Results-driven Backend Developer with strong experience in building scalable, secure, and high-performance applications using Java, Spring Boot, and Microservices architecture. Skilled in designing RESTful APIs, implementing authentication and authorization, and optimizing database performance with PostgreSQL and MongoDB. \n\nHands-on experience with distributed systems, Kafka-based event-driven architecture, and cloud deployment using Docker and CI/CD pipelines. Passionate about writing clean, maintainable code and solving complex backend challenges.\n\nStrong understanding of system design, data structures, and software engineering best practices. Looking to contribute to building robust backend systems in a fast-paced development environment.",
         "completionScore": 0,
         "active": true,
         "createdAt": "2026-03-02T13:44:10.330426",
-        "updatedAt": "2026-04-09T18:22:58.144945",
+        "updatedAt": "2026-06-26T18:09:33.91624",
         "workExperiences": [
             {
                 "id": 1,
-                "companyName": "Birla Tech",
+                "companyName": "Liberty Tech",
                 "companyLogoUrl": "https://cdn.pixabay.com/photo/2023/03/06/13/58/brand-7833518_1280.png",
                 "jobTitle": "Senior Developer",
                 "employmentType": "FULL_TIME",
@@ -160,7 +160,7 @@ export const resumes=[
         "educations": [
             {
                 "id": 1,
-                "institutionName": "MIT",
+                "institutionName": "Georgia Institute of Technology",
                 "degree": "B.S Computer",
                 "fieldOfStudy": "Computer Since",
                 "grade": "3",
@@ -172,19 +172,6 @@ export const resumes=[
             }
         ],
         "skills": [
-            {
-                "id": 1,
-                "skillName": "React",
-                "proficiencyLevel": "INTERMEDIATE",
-                "displayOrder": 0
-            },
-            {
-                "id": 2,
-                "skillName": "Spring boot",
-                "proficiencyLevel": "INTERMEDIATE",
-                "yearsOfExperience": 3,
-                "displayOrder": 0
-            },
             {
                 "id": 3,
                 "skillName": "MySQL",
@@ -212,13 +199,39 @@ export const resumes=[
                 "proficiencyLevel": "INTERMEDIATE",
                 "yearsOfExperience": 1,
                 "displayOrder": 0
+            },
+            {
+                "id": 2,
+                "skillName": "Spring boot",
+                "proficiencyLevel": "ADVANCED",
+                "yearsOfExperience": 3,
+                "displayOrder": 0
+            },
+            {
+                "id": 1,
+                "skillName": "React",
+                "proficiencyLevel": "EXPERT",
+                "displayOrder": 0
+            },
+            {
+                "id": 28,
+                "skillName": "Python",
+                "proficiencyLevel": "ELEMENTARY",
+                "yearsOfExperience": 1,
+                "displayOrder": 0
+            },
+            {
+                "id": 27,
+                "skillName": ".NET",
+                "proficiencyLevel": "BEGINNER",
+                "displayOrder": 0
             }
         ],
         "projects": [
             {
                 "id": 1,
-                "title": "Vertex Commerce",
-                "description": "vertex commerce is ecommerce plateforme where you can buy all kind of clothes, electronics item, grocery, home , kethan item extra...",
+                "title": "Liberty Market",
+                "description": "liberty market is an ecommerce plateforme where you can buy all kind of clothes, electronics item, grocery, home , kitchen item extra...",
                 "technologies": [
                     "react",
                     "spring boot",
@@ -229,21 +242,39 @@ export const resumes=[
                     "react router dom",
                     "redux"
                 ],
-                "projectUrl": "https://github.com/paulpeterson/interview-hub-social-space",
-                "sourceCodeUrl": "https://github.com/paulpeterson/interview-hub-social-space",
+                "projectUrl": "https://github.com/paulparkerson/interview-hub-social-space",
+                "sourceCodeUrl": "https://github.com/paulparkerson/interview-hub-social-space",
                 "startDate": "2025-01-06",
                 "endDate": "2025-06-17",
                 "isOngoing": false,
                 "displayOrder": 0
             }
         ],
-        "certifications": [],
-        "awards": [],
+        "certifications": [
+            {
+                "id": 3,
+                "name": "Full Stack Developerr",
+                "issuingOrganization": "TechForge Bootcamp",
+                "issueDate": "2026-06-10",
+                "credentialId": "TFB2347skf",
+                "credentialUrl": "https://superprofile.bio/codewithpaul",
+                "displayOrder": 0
+            }
+        ],
+        "awards": [
+            {
+                "id": 1,
+                "title": "Fifa World Cup",
+                "awardDate": "2024-06-28",
+                "description": "i won this award",
+                "displayOrder": 0
+            }
+        ],
         "languages": [
             {
                 "id": 1,
                 "languageName": "English",
-                "proficiency": "NATIVE",
+                "proficiency": "PROFESSIONAL",
                 "displayOrder": 0
             },
             {
@@ -255,7 +286,7 @@ export const resumes=[
             {
                 "id": 3,
                 "languageName": "French",
-                "proficiency": "PROFESSIONAL",
+                "proficiency": "NATIVE",
                 "displayOrder": 0
             }
         ]

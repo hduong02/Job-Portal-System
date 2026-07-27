@@ -16,6 +16,7 @@ const hasApplied = false;
 
 const JobCard = ({ job }) => {
 
+  const navigate=useNavigate()
   const location = [job.city, job.state, job.country]
     .filter(Boolean)
     .join(", ");

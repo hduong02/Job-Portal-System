@@ -6,6 +6,7 @@ import ApplyJob from "./pages/user/apply/ApplyJob";
 import Profile from "./pages/user/profile/Profile";
 import Application from "./pages/user/applications/Application";
 import SavedJobs from "./pages/user/savedJobs/SavedJobs";
+import Resumes from "./pages/user/resumes/Resumes";
 import EmployerLayout from "./layout/EmployerLayout";
 import Dashboard from "./pages/employer/dashboard/Dashboard";
 import EmployerJobs from "./pages/employer/jobs/EmployerJobs";
@@ -20,7 +21,9 @@ import JobMetaData from "./pages/admin/jobMetaData/JobMetaData";
 import AdminProfile from "./pages/admin/settings/AdminProfile";
 import AdminLayout from "./pages/admin/layout/AdminLayout";
 import Login from "./pages/auth/Login";
+import ResumeEdit from "./pages/user/resumeEdit/ResumeEdit";
 import Register from "./pages/auth/Register";
+
 import { Route, Routes } from "react-router-dom";
 
 function App() {
@@ -41,6 +44,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/applications" element={<Application />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />
+            <Route path="/resumes" element={<Resumes />} />
+            <Route path="/resumes/:id/edit" element={<ResumeEdit />} />
           </Route>
 
           {/* employer routes */}
@@ -52,7 +57,7 @@ function App() {
               <Route path="jobs/create" element={<CreateJob />} />
               <Route path="ai-screening" element={<AIScreening />} />
               <Route path="company" element={<CompanyProfile />} />
-              {/*<Route path="/employer/jobs/:jobId/edit" element={<CreateJob isEdit={true} />} />*/}
+              {/* <Route path="/employer/jobs/:jobId/edit" element={<CreateJob isEdit={true} />} /> */}
           </Route>
 
           <Route path="/admin" element={<AdminLayout />}>

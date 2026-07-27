@@ -37,7 +37,7 @@ if(job==null){
 
   return (
     <div className="p-8 min-w-7xl max-w-7xl max-auto space-y-3">
-      <Button>
+      <Button onClick={()=>navigate(-1)} variant="ghost">
         <ArrowLeft />
         Back To Jobs
       </Button>
