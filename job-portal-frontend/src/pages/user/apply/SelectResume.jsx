@@ -6,9 +6,20 @@ import { Label } from "@/components/ui/label";
 
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { resumes } from "./dummyResume"
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchMyResumes } from "../../../redux-store/resume/resumeThunk";
+import { useDispatch } from "react-redux";
+
+// import { resumes } from "./dummyResume"
 
 const SelectResume = ({ selectedResume, setSelectedResume }) => {
+  const {resumes}=useSelector(store=>store.resume)
+  const dispatch=useDispatch()
+  
+  useEffect(() => {
+    dispatch(fetchMyResumes());
+  }, []);
   return (
     <div className='space-y-6'>
       <div>

@@ -11,8 +11,13 @@ import { useState } from "react";
 import AdditionalDetails from "./AdditionalDetails";
 import ReviewSubmission from "./ReviewSubmission";
 import SelectResume from "./SelectResume";
+import { useDispatch } from "react-redux";
+import { submitApplication } from "../../../reduxt-store/application/applicationThunk";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchJobById } from "../../../redux-store/job/jobThunk";
 
-import { job } from "../jobs/dummyjob";
+// import { job } from "../jobs/dummyjob";
 
 const ApplyJob = () => {
   const navigate = useNavigate();
@@ -21,12 +26,15 @@ const ApplyJob = () => {
   const [coverLetter, setCoverLetter] = React.useState("");
   const [expectedSalary, setExpectedSalary] = useState("");
   const [availableFrom, setAvailableFrom] = useState(null);
-  const handleSubmit = () => {
-    
-  }
-  // const dispatch = useDispatch();
-  // const { currentJob: job } = useSelector((store) => store.job);
-  // const { id } = useParams();
+  const dispatch = useDispatch();
+  const { currentJob: job } = useSelector((store) => store.job);
+  const { id } = useParams();
+
+  useEffect(()=>{
+    if(id){
+      dispatch(fetchJobById(id))
+    }
+  },[id])
 
   const renderStep = () => {
     switch (currentStep) {
@@ -69,6 +77,17 @@ const ApplyJob = () => {
         return currentStep;
     }
   }
+
+  const handleSubmit = () => {
+    const data = {
+      jobId: id,
+      resumeId: selectedResume,
+      coverLetter: coverLetter,
+      expectedSalary,
+      availableFrom,
+    };
+    dispatch(submitApplication(data));
+  };
 
   return (
     <div className="min-w-4xl max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

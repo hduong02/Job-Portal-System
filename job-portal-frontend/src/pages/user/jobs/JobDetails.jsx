@@ -20,20 +20,35 @@ import { Separator } from "../../../components/ui/separator";
 import { Users } from "lucide-react";
 import { Eye } from "lucide-react";
 
-import {job} from "./dummyjob";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchJobById } from "../../../redux-store/job/jobThunk";
+import { useSelector } from "react-redux";
+
+// import {job} from "./dummyjob";
 
 const JobDetails = () => {
+  const {currentJob:job}=useSelector(state=>state.job)
   
-if(job==null){
-  return <div className="flex items-center justify-between min h-screen">
-    <h1 className="font-bold text-4xl">Job Not Found With Given Job Id - {id}</h1>
-  </div>
-}
+  const navigate=useNavigate()
+  const {id}=useParams()
+  const dispatch=useDispatch()
+
+
+  useEffect(()=>{
+    if(id){
+      dispatch(fetchJobById(id))
+    }
+  },[id])
+  
+  if(job==null){
+    return <div className="flex items-center justify-between min h-screen">
+      <h1 className="font-bold text-4xl">Job Not Found With Given Job Id - {id}</h1>
+    </div>
+  }
   
   const location = [job?.city, job?.state, job?.country];
-
-  const navigate = useNavigate();
 
   return (
     <div className="p-8 min-w-7xl max-w-7xl max-auto space-y-3">

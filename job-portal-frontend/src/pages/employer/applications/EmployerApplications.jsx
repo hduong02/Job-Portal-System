@@ -18,9 +18,16 @@ import { cn } from "../../../lib/utils";
 import ApplicationTable from "./ApplicationTable";
 import { useState } from "react";
 import UpdateStatusDialog from "./UpdateStatusDialog";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchCompanyApplications } from "../../../redux-store/application/applicationThunk";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { fetchMyJobs } from "../../../redux-store/job/jobThunk";
+import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
 
-import {applications} from "./applications"
-import { jobs } from "../../user/jobs/dummyjobs";
+// import {applications} from "./applications"
+// import { jobs } from "../../user/jobs/dummyjobs";
 
 const AI_SHORTLIST_FILTERS = [
   { value: "ALL", label: "All" },
@@ -50,6 +57,12 @@ const EmployerApplications = () => {
   const [aiFilter, setAiFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("DEFAULT");
   const [statusDialog, setStatusDialog] = useState(null);
+
+  const dispatch = useDispatch();
+  const { applications } = useSelector((state) => state.application);
+  const { myJobs: jobs } = useSelector((state) => state.job);
+  const { myCompany } = useSelector((state) => state.company);
+
   const stats = useMemo(
     () => ({
       total: applications.length,
@@ -63,6 +76,30 @@ const EmployerApplications = () => {
     }),
     [applications],
   );
+
+  useEffect(() => {
+    if (myCompany) {
+      dispatch(fetchMyJobs(myCompany?.id));
+    }
+  }, [myCompany]);
+
+  useEffect(() => {
+    dispatch(fetchMyCompany());
+  }, []);
+
+  useEffect(() => {
+    const filters = {};
+    if (jobFilter) filters.jobId = jobFilter;
+    if (statusFilter != "ALL") filters.status = statusFilter;
+    if (starredOnly) filters.isStarred = true;
+    if (unreadOnly) filters.isRead = false;
+    if (aiFilter !== "ALL") filters.aiShortlistStatus = aiFilter;
+    if (sortBy !== "DEFAULT") filters.sortBy = sortBy;
+
+    console.log("filters ----- ", filters);
+
+    dispatch(fetchCompanyApplications(filters));
+  }, [jobFilter, statusFilter, starredOnly, unreadOnly, aiFilter, setSortBy]);
 
   return (
     <main className="space-y-6">

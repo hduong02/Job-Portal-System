@@ -13,8 +13,14 @@ import DeleteConfirm from "./shared/DeleteConfirm";
 
 import { Progress } from "../../../components/ui/progress";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import {
+  addSkill,
+  deleteSkill,
+  updateSkill,
+} from "../../../redux-store/resume/resumeThunk";
 
-import { skills } from "./shared/skills";
+// import { skills } from "./shared/skills";
 
 const skillsData = {
   skillName: "",
@@ -38,11 +44,13 @@ export const PROFICIENCY_LEVELS = [
   "EXPERT",
 ];
 
-const SkillsSection = () => {
+const SkillsSection = ({ resumeId, resume }) => {
   const [open, setOpen] = useState(false);
   const [delItem, setDel] = useState(null);
   const [edit, setEdit] = useState(null);
   const [form, setForm] = useState(skillsData);
+  const skills = resume.skills;
+  const dispatch = useDispatch();
 
   const openEdit = (item) => {
     setEdit(item);
@@ -56,11 +64,18 @@ const SkillsSection = () => {
   };
 
   const save = () => {
+    const thunk = edit
+      ? updateSkill({ resumeId, skillId: edit.id, data: form })
+      : addSkill({ resumeId, data: form });
+
+    dispatch(thunk);
     console.log("save skills", form);
   };
+
   const f = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const handleDelete = () => {
+    dispatch(deleteSkill({resumeId,skillId:delItem.id}))
     console.log("deleting", delItem);
   };
 

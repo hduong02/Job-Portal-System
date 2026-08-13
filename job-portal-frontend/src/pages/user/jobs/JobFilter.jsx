@@ -38,9 +38,16 @@ const EXP_LEVELS = [
   { value: "EXECUTIVE", label: "Executive", sub: "C-level" },
 ];
 
-const minSalary = 60000
-const maxSalary = 100000
-const JobFilter = () => {
+function toggle(arr, val) {
+  return arr.includes(val) ? arr.filter((v) => v != val) : [...arr, val];
+}
+
+const JobFilter = ({ filters, setFilters, onReset }) => {
+  const { jobTypes, workModes, expLevels, minSalary, maxSalary } = filters;
+
+  const onChange = (key, val) =>
+    setFilters((prev) => ({ ...prev, [key]: val }));
+
   return (
     <Card className="sticky top-5 border-slate-200">
       <CardHeader className={"pb-3"}>
@@ -55,6 +62,7 @@ const JobFilter = () => {
 
           <div>
             <Button
+              onClick={onReset}
               variant="ghost"
               size="sm"
               className="h-7 text-xs text-slate-500 hover:text-red-600"
@@ -79,7 +87,12 @@ const JobFilter = () => {
                 className="flex items-center gap-2.5 cursor-pointer group"
                 key={value}
               >
-                <Checkbox/>
+                <Checkbox
+                  checked={jobTypes.includes(value)}
+                  onCheckedChange={() =>
+                    onChange("jobTypes", toggle(jobTypes, value))
+                  }
+                />
                 <span>{label}</span>
               </div>
             ))}
@@ -98,7 +111,9 @@ const JobFilter = () => {
                 className="flex items-center gap-2.5 cursor-pointer group"
                 key={value}
               >
-                <Checkbox/>
+                <Checkbox  checked={workModes.includes(value)}  onCheckedChange={() =>
+                    onChange("workModes", toggle(workModes, value))
+                  }/>
                 <span>{label}</span>
               </div>
             ))}
@@ -116,7 +131,9 @@ const JobFilter = () => {
                 className="flex items-center gap-2.5 cursor-pointer group"
                 key={value}
               >
-                <Checkbox/>
+                <Checkbox  checked={expLevels.includes(value)} onCheckedChange={() =>
+                    onChange("expLevels", toggle(expLevels, value))
+                  }/>
                 <span>{label}</span> (<span className="text-xs text-gray-500">{sub}</span>)
               </div>
             ))}
@@ -139,6 +156,9 @@ const JobFilter = () => {
             max={500000}
             step={10000}
             value={[minSalary, maxSalary]}
+            onValueChange={
+              ([min,max])=>setFilters((prev)=>({...prev,minSalary:min, maxSalary:max}))
+            }
           />
           <div className="flex justify-between text-xs text-slate-400 mt-1.5">
             <span>$0</span>

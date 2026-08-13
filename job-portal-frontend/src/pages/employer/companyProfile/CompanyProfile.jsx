@@ -2,6 +2,12 @@ import React from "react";
 import ProfileHeader from "./ProfileHeader";
 import CompanyDetails from "./CompanyDetails";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
+import { useSelector } from "react-redux";
+import CreateCompanyForm from "./CreateCompanyForm";
+
 
 function PageHeading() {
   return (
@@ -16,15 +22,21 @@ function PageHeading() {
 
 const CompanyProfile = () => {
 
+  const dispatch = useDispatch();
+  const { myCompany } = useSelector((state) => state.company);
 
-  // if (!myCompany) {
-  //   return (
-  //     <div className="space-y-5">
-  //       <PageHeading />
-  //       <CreateCompanyForm />
-  //     </div>
-  //   );
-  // }
+  useEffect(() => {
+    dispatch(fetchMyCompany());
+  }, []);
+
+  if (!myCompany) {
+    return (
+      <div className="space-y-5">
+        <PageHeading />
+        <CreateCompanyForm />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

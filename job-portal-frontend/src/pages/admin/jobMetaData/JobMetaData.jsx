@@ -13,11 +13,18 @@ import CategoryTab from "./CategoryTab";
 import SkillTab from "./SkillTab";
 import TagTab from "./TagTab";
 
-import {skills} from "./dummyData"
-import {tags} from "./dummyData"
-import {categories} from "./dummyData"
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchCategories, fetchSkills, fetchTags } from "../../../redux-store/jobMeta/jobMetaThunk";
+// import {skills} from "./dummyData"
+// import {tags} from "./dummyData"
+// import {categories} from "./dummyData"
 
 const JobMetaData = () => {
+  const { categories, skills, tags } = useSelector((state) => state.jobMeta);
+  const dispatch = useDispatch();
+
   const jobMetaData = [
     {
       icon: FolderTree,
@@ -39,6 +46,11 @@ const JobMetaData = () => {
     },
   ];
 
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSkills())
+    dispatch(fetchTags())
+  }, []);
 
   return (
     <div className="space-y-6">

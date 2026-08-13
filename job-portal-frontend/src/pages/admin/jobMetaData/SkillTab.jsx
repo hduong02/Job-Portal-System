@@ -23,6 +23,9 @@ import { MoreHorizontal } from "lucide-react";
 import { Pencil } from "lucide-react";
 import { Trash2 } from "lucide-react";
 
+import { useDispatch } from "react-redux";
+import { deleteSkill } from "../../../redux-store/jobMeta/jobMetaThunk";
+
 
 const SKILL_CATEGORIES = [
   "PROGRAMMING_LANGUAGE",
@@ -41,6 +44,7 @@ const SkillTab = ({ skills }) => {
   const [catFilter, setCatFilter] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const dispatch=useDispatch()
 
   const filtered = useMemo(() => {
     let list = [...skills];
@@ -64,6 +68,8 @@ const SkillTab = ({ skills }) => {
   };
 
   const handleDelete=(skill)=>{
+    dispatch(deleteSkill(skill.id))
+    console.log("deleted skill ",skill)
     setFormOpen(false)
   }
 

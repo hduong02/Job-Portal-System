@@ -6,9 +6,14 @@ import React from "react";
 import StatsCard from "./StatsCard";
 import UserTable from "../users/UserTable";
 
-import {users} from "./userData"
+// import {users} from "./userData"
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchAllUsers } from "../../../redux/slices/adminUserSlice";
 
 const AdminDashboard = () => {
+  const {users}=useSelector(state=>state.adminUser)
+  const dispatch=useDispatch()
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -47,6 +52,11 @@ const AdminDashboard = () => {
     description: "3,211 submitted today",
   },
 ];
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, []);
+
 
   return (
     <div className="space-y-6">

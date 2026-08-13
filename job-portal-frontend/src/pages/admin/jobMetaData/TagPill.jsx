@@ -3,11 +3,15 @@ import { cn } from "../../../lib/utils";
 import { Pencil } from "lucide-react";
 import { Trash2 } from "lucide-react";
 
+import { useDispatch } from "react-redux";
+import { deleteTag } from "../../../redux-store/jobMeta/jobMetaThunk";
 
-const TagPill = ({ tag, colorClass,onEdit }) => {
+const TagPill = ({ tag, colorClass, onEdit }) => {
+  
+  const dispatch=useDispatch()
 
   const handleDelete=()=>{
-    
+    dispatch(deleteTag(tag.id))
   }
 
   return (

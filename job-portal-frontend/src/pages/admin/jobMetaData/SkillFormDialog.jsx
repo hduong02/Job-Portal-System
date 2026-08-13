@@ -19,6 +19,9 @@ import {
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
 
+import { useDispatch } from "react-redux";
+import { createSkill, updateSkill } from "../../../redux-store/jobMeta/jobMetaThunk";
+
 const SKILL_CATEGORIES = [
   "PROGRAMMING_LANGUAGE",
   "FRAMEWORK",
@@ -43,10 +46,18 @@ const SkillFormDialog = ({
     name: "",
     category: "",
   });
+  const dispatch=useDispatch()
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    if(initialData){
+      const data={
+        id:initialData.id,
+        ...form
+      }
+      console.log("skill data", data)
+      dispatch(updateSkill(data))
+    } else dispatch(createSkill(form))
     console.log("form data", form);
   };
 
@@ -57,14 +68,14 @@ const SkillFormDialog = ({
         category: initialData?.category ?? ""
       });
     }
-    console.log("intialdata ",initialData?.category)
+    console.log("initial data ",initialData?.category)
   }, [open, initialData]);
   
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Category" : "Add Skill"}</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Skill" : "Add Skill"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">

@@ -16,9 +16,14 @@ import { Textarea } from "../../../components/ui/textarea";
 import TagInput from "./shared/TagInput";
 import DeleteConfirm from "./shared/DeleteConfirm";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import {
+  addWorkExperience,
+  updateEducation,
+  updateWorkExperience,
+} from "../../../redux-store/resume/resumeThunk";
 
-
-import { workExperienceData } from "./shared/workExperienceData";
+// import { workExperienceData } from "./shared/workExperienceData";
 
 export const JOB_TYPES = [
   "FULL_TIME",
@@ -41,12 +46,14 @@ const experienceData = {
   technologies: ["react", "spring boot", "FastAPI", "AWS"],
 };
 
-const WorkExperienceSection = () => {
+const WorkExperienceSection = ({ resumeId, resume }) => {
   const [open, setOpen] = useState(false);
   const [delItem, setDel] = useState(null);
   const [edit, setEdit] = useState(null);
   const [form, setForm] = useState(experienceData);
-
+  const workExperienceData = resume.workExperiences || [];
+  const dispatch = useDispatch();
+  
   const openEdit = (item) => {
     setEdit(item);
     setOpen(true);
@@ -60,9 +67,23 @@ const WorkExperienceSection = () => {
   };
 
   const save = () => {
+    const payload = {
+      ...form,
+      endDate: form.isCurrentJob ? null : form.endDate || null,
+    };
+    const thunk = edit
+      ? updateWorkExperience({
+          resumeId,
+          workExperienceId: edit.id,
+          data: payload,
+        })
+      : addWorkExperience({ resumeId, data: payload });
+
+    dispatch(thunk);
     setEdit(null)
     console.log("save work experience", form);
   };
+  
   const f = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const handleDelete = () => {

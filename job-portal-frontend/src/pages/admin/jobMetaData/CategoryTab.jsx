@@ -27,12 +27,14 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Pencil } from "lucide-react";
 import { Trash2 } from "lucide-react";
-
+import { useDispatch } from "react-redux";
+import { deleteCategory } from "../../../redux-store/jobMeta/jobMetaThunk";
 
 const CategoryTab = ({ categories }) => {
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const dispatch=useDispatch();
 
   const filtered = useMemo(() => {
     let list = [...categories];
@@ -59,7 +61,7 @@ const CategoryTab = ({ categories }) => {
   };
 
   const handleDelete=(category)=>{
-
+    dispatch(deleteCategory(category.id))
     setFormOpen(false)
   }
   return (
@@ -191,7 +193,6 @@ const CategoryTab = ({ categories }) => {
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
-         
         }}
         rootCategories={rootCategories}
         initialData={editTarget}

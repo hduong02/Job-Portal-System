@@ -30,8 +30,15 @@ import { Sparkles } from "lucide-react";
 import { ScrollText } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 
+import { useDispatch } from "react-redux";
+import { toggleStar } from "../../../redux-store/application/applicationThunk";
 
 const ApplicationTable = ({ applications, isFullMode, onUpdateStatus }) => {
+  const dispatch=useDispatch()
+  
+  const handleStar=(id)=>{
+    dispatch(toggleStar(id))
+  }
 
   return (
     <Table>

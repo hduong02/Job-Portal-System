@@ -18,17 +18,26 @@ import {
   FieldLabel,
 } from "../../../components/ui/field";
 import { Button } from "../../../components/ui/button";
+import { useDispatch } from "react-redux";
+import { createResume } from "../../../redux-store/resume/resumeThunk";
 
 const CreateResumeDialog = ({ open, onClose }) => {
   const [title, setTitle] = useState("");
   const [isDefault, setIsDefault] = useState();
-
+  const dispatch = useDispatch();
+  
   const handleClose = () => {
     onClose();
   };
+  
   const handleSubmit = () => {
-
-    console.log("resume data", { title, isDefault});
+    dispatch(createResume({
+      title,
+      isDefault,
+      template: "PROFESSIONAL",
+      visibility: "PUBLIC",
+    }))
+    console.log("resume data", { title, isDefault });
   };
   return (
     <Dialog open={open} onOpenChange={handleClose}>

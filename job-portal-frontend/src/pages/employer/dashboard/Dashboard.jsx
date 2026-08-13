@@ -16,10 +16,20 @@ import {
 } from "../../../components/ui/card";
 import { Users } from "lucide-react";
 import RecentApplicationTable from "./RecentApplicationTable";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
+import { fetchMyJobs } from "../../../redux-store/job/jobThunk";
+import { useSelector } from "react-redux";
 
-import { recent as applications } from "./recentApplications"
+// import { recent as applications } from "./recentApplications"
 
 const Dashboard = () => {
+  const dispatch=useDispatch()
+  const { myJobs: jobs } = useSelector((state) => state.job);
+  const { myCompany } = useSelector((state) => state.company);
+  const { applications } = useSelector((store) => store.application);
+
   const activeJobs=[...jobs].filter((job)=>job.status=="OPEN")
   const shortListed=[...applications].filter((app)=>app.status=="SHORTLISTED")
 
@@ -45,6 +55,16 @@ const Dashboard = () => {
       icon: UserCheck,
     },
   ];
+
+  useEffect(() => {
+    dispatch(fetchMyCompany());
+  }, []);
+
+    useEffect(() => {
+    if (myCompany) {
+      dispatch(fetchMyJobs(myCompany?.id));
+    }
+  }, [myCompany]);
 
   return (
     <div className="p-6 space-y-6">

@@ -5,17 +5,22 @@ import { UsersIcon } from "lucide-react";
 import { UserCheck } from "lucide-react";
 import { Briefcase } from "lucide-react";
 import { UserX } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import UserFilter from "./UserFilter";
 import UserTable from "./UserTable";
 
-import { users } from "./userData";
+import { fetchAllUsers } from "../../../redux/slices/adminUserSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
 
-import { useState } from "react";
+// import { users } from "./userData";
 
 const AdminUsers = () => {
   const [roleFilter,setRoleFilter]=useState("all")
   const [statusFilter,setStatusFilter]=useState("all")
+
+  const dispatch = useDispatch();
+  const {users} = useSelector(state=>state.adminUser)
 
   const filtered=useMemo(()=>{
 
@@ -35,6 +40,10 @@ const AdminUsers = () => {
     const suspended = users.filter((u) => u.status === "SUSPENDED").length;
     return { total, seekers, employers, suspended };
   }, [users]);
+
+  useEffect(() => {
+    dispatch(fetchAllUsers);
+  }, []);
 
   const summaryCards = [
     {

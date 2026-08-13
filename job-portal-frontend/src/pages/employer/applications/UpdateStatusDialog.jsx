@@ -16,6 +16,9 @@ import {
 import { Button } from "../../../components/ui/button";
 import { useState } from "react";
 
+import { useDispatch } from "react-redux";
+import { updateApplicationStatus } from "../../../redux-store/application/applicationThunk";
+
 const STATUSES = [
   { value: "PENDING", label: "Pending", color: "text-slate-600" },
   { value: "REVIEWING", label: "Reviewing", color: "text-primary" },
@@ -28,18 +31,24 @@ const STATUSES = [
   { value: "REJECTED", label: "Rejected", color: "text-red-600" },
   { value: "HIRED", label: "Hired", color: "text-emerald-600" },
 ];
-const UpdateStatusDialog = ({
-  open,
-  onClose,
-  applicationId,
-  currentStatus,
-}) => {
+  const UpdateStatusDialog = ({
+    open,
+    onClose,
+    applicationId,
+    currentStatus,
+  }) => {
     const [status,setStatus]=useState(currentStatus || "")
+    const dispatch=useDispatch();
 
-
-    const handleSubmit=()=>{
-
-    }
+  const handleSubmit=()=>{
+    dispatch(updateApplicationStatus({
+      id:applicationId,
+      status,
+      note:"employer update status"
+    }))
+    onClose()
+  }
+  
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>

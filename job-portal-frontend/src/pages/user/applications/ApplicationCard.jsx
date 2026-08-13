@@ -1,16 +1,16 @@
 import React from "react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { CheckCircle2 } from "lucide-react";
-
 import { MapPin } from "lucide-react";
 import { Briefcase } from "lucide-react";
 import { DollarSign } from "lucide-react";
 import { Clock } from "lucide-react";
-
 import { Separator } from "../../../components/ui/separator";
 import { Button } from "../../../components/ui/button";
 import { ExternalLink } from "lucide-react";
 
+import { withdrawApplication } from "../../../redux-store/application/applicationThunk";
+import { useDispatch } from "react-redux";
 
 export const PIPELINE = [
   "PENDING",
@@ -21,15 +21,15 @@ export const PIPELINE = [
 ];
 
 const ApplicationCard = ({ app }) => {
-  const myPiplineIndex = PIPELINE.indexOf(app.status);
-
+  const myPipelineIndex = PIPELINE.indexOf(app.status);
+  const dispatch = useDispatch();
   const job = app.job;
   const location = [job.city, job.state, job.country]
     .filter(Boolean)
     .join(", ");
 
   const handleWithdrawalApplication = (id) => {
-    
+    dispatch(withdrawApplication({ id, reason: "I'm not interested anymore" }));
   };
   return (
     <Card>
@@ -98,7 +98,7 @@ const ApplicationCard = ({ app }) => {
               {PIPELINE.map((item, i) => (
                 <div
                   className={`h-1.5 rounded-full flex-1 transition-colors ${
-                    myPiplineIndex >= i ? "bg-primary" : "bg-slate-200"
+                    myPipelineIndex >= i ? "bg-primary" : "bg-slate-200"
                   }`}
                 ></div>
               ))}

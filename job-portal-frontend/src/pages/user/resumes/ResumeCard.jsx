@@ -12,6 +12,9 @@ import { Star } from "lucide-react";
 import { StarOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { useDispatch } from "react-redux";
+import { setDefaultResume } from "../../../redux-store/resume/resumeThunk";
+
 function computeCompletionScore(resume){
   let score=0;
 
@@ -29,13 +32,15 @@ function computeCompletionScore(resume){
 }
 
 const ResumeCard = ({ resume }) => {
-  const navigate=useNavigate()
+  const navigate=useNavigate();
+  const dispatch=useDispatch();
 
   const handleSetDefaultResume=()=>{
-    
+    dispatch(setDefaultResume(resume.id))
   }
 
   const completionScore = computeCompletionScore(resume);
+  
   return (
     <Card>
       <CardContent>

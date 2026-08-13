@@ -4,12 +4,18 @@ import { ScrollArea } from '../../components/ui/scroll-area';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { LogOut } from 'lucide-react';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/slices/authSlice';
 
 const AdminSidebar = ({navigation}) => {
 
-  const handleLogout=()=>{
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
 
+  const handleLogout=()=>{
+    
+    dispatch(logout())
+    navigate("/")
   }
   return (
     <div className="relative flex flex-col bg-slate-950 transition-all duration-300 shrink-0 w-64">

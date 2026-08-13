@@ -16,9 +16,15 @@ import {
 } from "../../../components/ui/select";
 import { useState } from "react";
 import JobFilter from "./JobFilter";
-
 import JobCard from "./JobCard";
-import { jobs } from './dummyjobs';
+
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchJobs } from "../../../reduxt-store/job/jobThunk";
+import { useSelector } from "react-redux";
+import { enhanceSearch } from "../../../reduxt-store/ai/aiThunk";
+import { useMemo } from "react";
+// import { jobs } from './dummyjobs';
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest first" },
@@ -26,18 +32,108 @@ const SORT_OPTIONS = [
   { value: "salary-low", label: "Salary: low → high" },
 ];
 
+const DEFAULT_FILTERS = {
+  jobTypes: [],
+  workModes: [],
+  expLevels: [],
+  minSalary: 0,
+  maxSalary: 500000,
+  keyword: undefined,
+  location: undefined,
+};
+
 const Jobs = () => {
   const [aiQuery, setAiQuery] = React.useState("");
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value);
   const [page, setPage] = useState(1);
+  const dispatch = useDispatch();
+  const { jobs } = useSelector((state) => state.job);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const handleSortBy = (value) => {
     (setSortBy(value), setPage(1));
   };
 
-  const handleEnhance = () => {
+  useEffect(() => {
+    const param = {
+      keyword: filters.keyword || undefined,
+      location: filters.location || undefined,
+      jobType: filters.jobTypes.length > 0 ? filters.jobTypes[0] : undefined,
+      workMode: filters.workModes.length > 0 ? filters.workModes[0] : undefined,
+      experienceLevel:
+        filters.expLevels.length > 0 ? filters.expLevels[0] : undefined,
+      minSalary: filters.minSalary > 0 ? filters.minSalary : undefined,
+      maxSalary: filters.maxSalary < 500000 ? filters.maxSalary : undefined,
+    };
 
-  }
+    const active = Object.values(param).filter(
+      (value) => value !== undefined,
+    ).length;
+
+    setActiveFilterCount(active);
+
+    dispatch(fetchJobs(param));
+  }, [filters]);
+
+  const handleFilter = (val) => {
+    setFilters(val);
+    setPage(1);
+  };
+
+  const handleEnhance = async () => {
+    const result = await dispatch(enhanceSearch(aiQuery));
+
+    if (result.meta.requestStatus != "fulfilled") {
+      console.log("no results found");
+      return;
+    }
+
+    const enh = result.payload;
+
+    const hasResults =
+      enh.keywords?.length ||
+      enh.jobTypes?.length ||
+      enh.workModes?.length ||
+      enh.experienceLevels?.length ||
+      enh.minSalary ||
+      enh.locations.length;
+
+    if (!hasResults) {
+      console.log("no results found");
+      return;
+    }
+
+    const newFilters = {
+      ...DEFAULT_FILTERS,
+    };
+    if (enh.keyword?.length) newFilters.keyword = enh.keyword;
+    if (enh.jobTypes?.length) newFilters.jobTypes = enh.jobTypes;
+    if (enh.workModes?.length) newFilters.workModes = enh.workModes;
+    if (enh.experienceLevels?.length)
+      newFilters.expLevels = enh.experienceLevels;
+    if (enh.minSalary) newFilters.minSalary = enh.minSalary;
+    if (enh.locations) newFilters.location = enh.locations[0];
+
+    console.log("new filters", newFilters);
+
+    setFilters(newFilters);
+  };
+
+  const sortedJobs = useMemo(() => {
+    const sorted = [...jobs];
+    if (sortBy == "salary-high")
+      return sorted.sort(
+        (a, b) => Number(b.maxSalary ?? 0) - Number(a.maxSalary ?? 0),
+      );
+    if (sortBy == "salary-low")
+      return sorted.sort(
+        (a, b) => Number(a.minSalary ?? 0) - Number(b.minSalary ?? 0),
+      );
+    return sorted.sort(
+      (a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0),
+    );
+  }, [sortBy, jobs]);
 
   return (
 
@@ -76,7 +172,7 @@ const Jobs = () => {
                 Tip: Ctrl + Enter to search
               </p>
               <Button
-                // onClick={handleEnhance}
+                onClick={handleEnhance}
                 className=" rounded-xl px-6 py-6 cursor-pointer"
               >
                 <Wand2 className="h-4 w-4 mr-1.5" /> Search With AI
@@ -101,11 +197,13 @@ const Jobs = () => {
                   <p className="text-xs text-slate-500">java developer</p>
                 </div>
               </div>
-              <Badge className="bg-blue-100 text-primary hover:bg-blue-200 cursor-pointer">
-                <X className="h-3 w-3 mr-1" />
-                {4} filters
-              </Badge>
 
+              {activeFilterCount > 0 && (
+                <Badge className="bg-blue-100 text-primary hover:bg-blue-200 cursor-pointer">
+                  <X className="h-3 w-3 mr-1" />
+                  {activeFilterCount} filters
+                </Badge>
+              )}
             </div>
             <div className="">
               <div className="flex items-center gap-1.5">
@@ -128,7 +226,14 @@ const Jobs = () => {
           {/* main grid */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="sticky top-6 h-[calc(100vh-3rem)] overflow-y-auto scrollbar-hide border rounded-xl shadow-sm">
-              <JobFilter />
+              <JobFilter
+                filters={filters}
+                setFilters={handleFilter}
+                onReset={() => {
+                  setFilters(DEFAULT_FILTERS);
+                  setPage(1);
+                }}
+              />
             </div>
 
             {/* Job list */}

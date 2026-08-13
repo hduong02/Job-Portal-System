@@ -5,10 +5,15 @@ import { useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { Save } from "lucide-react";
+import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateCompany } from "../../../reduxt-store/company/companyThunk";
 
 const CompanyDetails = () => {
 
+  const { myCompany } = useSelector((state) => state.company);
+  const dispatch=useDispatch()
   const [form, setForm] = useState({
     name: "",
     tagline: "",
@@ -29,9 +34,19 @@ const CompanyDetails = () => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
+  useEffect(()=>{
+
+    if(myCompany){
+      setForm({
+        ...myCompany
+      })
+    }
+
+  },[myCompany])
 
   const handleSubmit=(e) => {
     e.preventDefault();
+    dispatch(updateCompany({id:myCompany.id,...form}))
     console.log("Form submitted:", form);
   }
 

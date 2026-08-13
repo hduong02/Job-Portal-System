@@ -2,19 +2,21 @@ import React from "react";
 import { Badge } from "../../../components/ui/badge";
 import { Shield } from "lucide-react";
 import { Building2 } from "lucide-react";
+import { useSelector } from "react-redux";
 
-const myCompany = {
-  name: "Nimbus Analytics",
-  tagline: "Turning raw data into decisions you can trust",
-  logoUrl: "", // leave empty string to trigger the fallback Building2 icon
-  coverImageUrl: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&h=300&fit=crop",
-  industryType: "Software & Technology",
-  companyType: "Private",
-  companySize: "51-200 employees",
-  foundedYear: "Founded 2016",
-};
+// const myCompany = {
+//   name: "Nimbus Analytics",
+//   tagline: "Turning raw data into decisions you can trust",
+//   logoUrl: "", // leave empty string to trigger the fallback Building2 icon
+//   coverImageUrl: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&h=300&fit=crop",
+//   industryType: "Software & Technology",
+//   companyType: "Private",
+//   companySize: "51-200 employees",
+//   foundedYear: "Founded 2016",
+// };
 
 const ProfileHeader = () => {
+  const { myCompany } = useSelector((state) => state.company);
   return (
     <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
       <div

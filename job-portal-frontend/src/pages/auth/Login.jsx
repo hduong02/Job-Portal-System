@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AuthLayout from "./AuthLayout";
 import { Label } from "../../components/ui/label";
 import { Mail } from "lucide-react";
@@ -11,9 +11,13 @@ import { Lock } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch , useSelector } from "react-redux";
+import { loginUser } from "../../redux-store/user/userThunk";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -28,8 +32,14 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     console.log("login form data", data);
-
+    dispatch(loginUser(data))
   };
+
+  useEffect(()=>{
+    if (isAuthenticated && user) {
+      navigate("/jobs")
+    }
+  },[isAuthenticated, user])
 
   return (
     <AuthLayout

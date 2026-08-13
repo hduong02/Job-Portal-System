@@ -26,12 +26,30 @@ import { Send } from "lucide-react";
 import { Save } from "lucide-react";
 import { Separator } from "../../../components/ui/separator";
 import { Badge } from "../../../components/ui/badge";
-
+import { useDispatch } from "react-redux";
+import { createJob, fetchJobById } from "../../../redux-store/job/jobThunk";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import {
+  fetchCategories,
+  fetchSkills,
+  fetchTags,
+} from "../../../redux-store/jobMeta/jobMetaThunk";
 import { useParams } from "react-router-dom";
+import {
+  generateJobBenefits,
+  generateJobDescription,
+  generateJobRequirements,
+  generateJobResponsibilities,
+  recommendJobSkills,
+  recommendJobTags,
+  suggestSalary,
+} from "../../../redux-store/ai/aiThunk";
 
-import { categories } from "./categories"
-import { tags } from "./tags";
-import { skills } from "./skills";
+
+// import { categories } from "./categories"
+// import { tags } from "./tags";
+// import { skills } from "./skills";
 
 const EXP_LEVELS = [
   "ENTRY_LEVEL",
@@ -55,6 +73,25 @@ const CURRENCIES = ["USD", "INR", "EUR", "GBP", "CAD", "AUD", "SGD"];
 
 const CreateJob = ({ isEdit = false }) => {
   const { jobId } = useParams();
+  const dispatch = useDispatch();
+  const { categories, skills, tags } = useSelector((state) => state.jobMeta);
+  const { currentJob } = useSelector((state) => state.job);
+  const {
+    jobDescription,
+    jobRequirements,
+    salarySuggestion,
+    recommendedSkills,
+    jobResponsibilities,
+    jobBenefits,
+    recommendedTags,
+    isGeneratingJobDescription,
+    isGeneratingJobRequirements,
+    isSuggestingSalary,
+    isRecommendingSkills,
+    isGeneratingJobResponsibilities,
+    isGeneratingJobBenefits,
+    isRecommendingTags,
+  } = useSelector((store) => store.ai);
 
   const [form, setForm] = useState({
     title: "",
@@ -96,17 +133,58 @@ const CreateJob = ({ isEdit = false }) => {
     ["Salary", !!(form.minSalary || form.maxSalary)],
   ];
 
-let isGeneratingJobDescription = false;
-let isGeneratingJobRequirements = false;
-let isSuggestingSalary = false;
-let isRecommendingSkills = false;
-let isGeneratingJobResponsibilities = false;
-let isGeneratingJobBenefits = false;
-let isRecommendingTags = false;
-
   const handleSubmit = () => {
-    
+    console.log("form data ", form);
+    dispatch(createJob(form));
   };
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSkills());
+    dispatch(fetchTags());
+  }, []);
+
+  useEffect(() => {
+    if (jobId) {
+      dispatch(fetchJobById(jobId));
+    }
+  }, [jobId]);
+
+  useEffect(() => {
+    if (currentJob && isEdit) {
+      setForm({
+        title: currentJob.title || "",
+        description: currentJob.description ?? "",
+        requirements: currentJob.requirements ?? "",
+        responsibilities: currentJob.responsibilities ?? "",
+        benefits: currentJob.benefits ?? "",
+        categoryId: currentJob.category?.id
+          ? String(currentJob.category.id)
+          : "",
+        skillIds: currentJob.skills ? currentJob.skills.map((s) => s.id) : [],
+        tagIds: currentJob.tags ? currentJob.tags.map((t) => t.id) : [],
+        address: currentJob.address ?? "",
+        city: currentJob.city ?? "",
+        state: currentJob.state ?? "",
+        country: currentJob.country ?? "",
+        zipCode: currentJob.zipCode ?? "",
+        minSalary:
+          currentJob.minSalary != null ? String(currentJob.minSalary) : "",
+        maxSalary:
+          currentJob.maxSalary != null ? String(currentJob.maxSalary) : "",
+        currency: currentJob.currency ?? "USD",
+        salaryPeriod: currentJob.salaryPeriod ?? "",
+        salaryNegotiable: currentJob.salaryNegotiable ?? false,
+        salaryDisclosed: currentJob.salaryDisclosed ?? true,
+        jobType: currentJob.jobType ?? "",
+        workMode: currentJob.workMode ?? "",
+        experienceLevel: currentJob.experienceLevel ?? "",
+        openings: currentJob.openings ?? 1,
+        applicationDeadline: currentJob.applicationDeadline ?? "",
+        expiresAt: currentJob.expiresAt ?? "",
+      });
+    }
+  }, [currentJob]);
 
   const selectedSkillsName = (skillOpts) => {
     skillOpts
@@ -117,32 +195,209 @@ let isRecommendingTags = false;
 
 
   const handleGenerateDescription = () => {
+    if (!form.title) return;
 
+    const categoryName = categories.find(
+      (c) => String(c.id) === form.categoryId,
+    )?.name;
+
+    dispatch(
+      generateJobDescription({
+        title: form.title,
+        skills: selectedSkillsName(
+          skills.map((s) => ({ id: s.id, name: s.name })),
+        ),
+        experienceLevel: form.experienceLevel || undefined,
+        jobType: form.jobType || undefined,
+        workMode: form.workMode || undefined,
+        category: categoryName,
+      }),
+    );
   };
 
   const handleAutoFillRequirements = () => {
+    if (!form.title) return;
 
+    const categoryName = categories.find(
+      (c) => String(c.id) === form.categoryId,
+    )?.name;
+    dispatch(
+      generateJobRequirements({ title: form.title, category: categoryName }),
+    );
   };
 
   const handleAutoFillResponsibilities = () => {
+    if (!form.title) return;
 
+    const categoryName = categories.find(
+      (c) => String(c.id) === form.categoryId,
+    )?.name;
+    dispatch(
+      generateJobResponsibilities({
+        title: form.title,
+        category: categoryName,
+      }),
+    );
   };
 
   const handleAutoFillBenefits = () => {
+    if (!form.title) return;
 
+    const categoryName = categories.find(
+      (c) => String(c.id) === form.categoryId,
+    )?.name;
+    dispatch(
+      generateJobBenefits({
+        title: form.title,
+        category: categoryName,
+        jobType: form.jobType || undefined,
+      }),
+    );
   };
 
   const handleRecommendTags = () => {
-
+    if (!form.title.trim()) {
+      return;
+    }
+    dispatch(
+      recommendJobTags({
+        title: form.title,
+        description: form.description || undefined,
+      }),
+    );
   };
 
   const handleRecommendSkills = () => {
-
+    if (!form.title.trim()) return;
+    dispatch(
+      recommendJobSkills({
+        title: form.title,
+        description: form.description || undefined,
+      }),
+    );
   };
 
   const handleSuggestSalary = () => {
-
+    if (!form.title.trim()) return;
+    const skillNames = selectedSkillsName(
+      skills.map((s) => ({ id: s.id, name: s.name })),
+    );
+    dispatch(
+      suggestSalary({
+        title: form.title,
+        skills: skillNames || undefined,
+        experienceLevel: form.experienceLevel || undefined,
+        jobType: form.jobType || undefined,
+        location: form.city || form.country || undefined,
+      }),
+    );
   };
+
+  useEffect(() => {
+    if (!jobDescription) return;
+    setForm((f) => ({ ...f, description: jobDescription.content }));
+  }, [jobDescription]);
+
+  useEffect(() => {
+    if (!jobRequirements) return;
+    setForm((f) => ({ ...f, description: jobRequirements.content }));
+  }, [jobRequirements]);
+
+  useEffect(() => {
+    if (!jobResponsibilities) return;
+    setForm((f) => ({ ...f, responsibilities: jobResponsibilities.content }));
+  }, [jobResponsibilities]);
+
+  useEffect(() => {
+    if (!jobBenefits) return;
+    setForm((f) => ({ ...f, benefits: jobBenefits.content }));
+  }, [jobBenefits]);
+
+  useEffect(() => {
+    if (!salarySuggestion) return;
+
+    console.log("salary suggestion from redux  ", salarySuggestion)
+    setForm((f) => ({
+      ...f,
+      minSalary:
+        salarySuggestion.minSalary != null
+          ? String(salarySuggestion.minSalary)
+          : f.minSalary,
+      maxSalary:
+        salarySuggestion.maxSalary != null
+          ? String(salarySuggestion.maxSalary)
+          : f.maxSalary,
+    }));
+  }, [salarySuggestion]);
+
+  useEffect(() => {
+    if (!recommendedSkills || skills.length == 0) return;
+
+    const aiGeneratedSkills=recommendedSkills.content
+    const names = aiGeneratedSkills
+      .split(", ")
+      .map((t) => t.trim().toLowerCase());
+
+    const skillOpts = skills.map((t) => ({ id: t.id, name: t.name }));
+
+    console.log("skill opts", skillOpts)
+
+    const matched = skillOpts.filter((skill) =>
+      names.some(
+        (n) =>
+          skill.name.toLowerCase() === n ||
+          skill.name.toLowerCase().includes(n) ||
+          n.includes(skill.name.toLowerCase()),
+      ),
+    );
+
+    console.log("matched skills",matched)
+
+    const newIds = matched
+      .map((skill) => skill.id)
+      .filter((id) => !form.skillIds.includes(id));
+
+    if (newIds.length > 0) {
+      setForm((f) => ({ ...f, skillIds: [...f.skillIds, ...newIds] }));
+    }
+  }, [recommendedSkills, skills]);
+
+  useEffect(() => {
+  
+    if (!recommendedTags || tags.length == 0) return;
+
+    const aiGeneratedTags = recommendedTags?.content;
+    const names = aiGeneratedTags
+      .split(", ")
+      .map((t) => t.trim().toLowerCase());
+
+    console.log("names --- ", names, tags);
+
+    const tagOpts = tags.map((t) => ({ id: t.id, name: t.name }));
+
+    console.log("tag opts", tagOpts);
+
+    const matched = tagOpts.filter((tag) =>
+      names.some(
+        (n) =>
+          tag.name.toLowerCase() === n ||
+          tag.name.toLowerCase().includes(n) ||
+          n.includes(tag.name.toLowerCase()),
+      ),
+    );
+
+    console.log("matched tags - ", matched);
+
+    const newIds = matched
+      .map((tag) => tag.id)
+      .filter((id) => !form.tagIds.includes(id));
+
+    if (newIds.length > 0) {
+      setForm((f) => ({ ...f, tagIds: [...f.tagIds, ...newIds] }));
+    }
+
+    console.log("tags form redux store ----- ", recommendedTags);
+  }, [recommendedTags, tags]);
 
 
   return (

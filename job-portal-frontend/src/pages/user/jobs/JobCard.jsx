@@ -12,6 +12,9 @@ import { Separator } from "../../../components/ui/separator";
 import { Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { useDispatch } from "react-redux";
+import { saveJob } from "../../../redux-store/saveJobs/saveJobThunk";
+
 const hasApplied = false;
 
 const JobCard = ({ job }) => {
@@ -20,6 +23,11 @@ const JobCard = ({ job }) => {
   const location = [job.city, job.state, job.country]
     .filter(Boolean)
     .join(", ");
+
+  const dispatch=useDispatch()
+  const handleSavedJob=()=>{
+    dispatch(saveJob({jobId:job.id}))
+  }
 
   return (
     <Link to={`/jobs/${job?.id}`}>
@@ -61,7 +69,7 @@ const JobCard = ({ job }) => {
                     {job.company.tagline}
                   </p>
                 </div>
-                <Button variant="ghost">
+                <Button onClick={handleSavedJob} variant="ghost">
                   <Bookmark />
                 </Button>
               </div>
@@ -119,7 +127,7 @@ const JobCard = ({ job }) => {
                       Applied
                     </Button>
                   ) : (
-                    <Button size="sm">Quick Apply</Button>
+                    <Button onClick={()=>navigate(`/jobs/${job.id}`)} size="sm">Quick Apply</Button>
                   )}
                 </div>
               </>

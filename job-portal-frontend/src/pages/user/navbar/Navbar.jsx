@@ -22,26 +22,30 @@ import { FileText } from "lucide-react";
 import { Bookmark } from "lucide-react";
 import { ScrollText } from "lucide-react";
 import { LogOut } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../reduxt-store/user/userSlice";
 
-const user =   {
-    authProvider: "LOCAL",
-    createdAt: "2026-05-02T08:45:34.687564",
-    email: "jacob.miller@gmail.com",
-    fullName: "Jacob Miller",
-    id: 5,
-    lastLogin: "2026-05-07T13:49:30.62777",
-    phone: "8654328976",
-    role: "ROLE_JOB_SEEKER",
-    status: "ACTIVE",
-    verified: false,
-}
+// const user =   {
+//     authProvider: "LOCAL",
+//     createdAt: "2026-05-02T08:45:34.687564",
+//     email: "jacob.miller@gmail.com",
+//     fullName: "Jacob Miller",
+//     id: 5,
+//     lastLogin: "2026-05-07T13:49:30.62777",
+//     phone: "8654328976",
+//     role: "ROLE_JOB_SEEKER",
+//     status: "ACTIVE",
+//     verified: false,
+// }
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch()
 
   const handleLogout=()=>{
-
+    dispatch(logout())
   }
 
   const isActive = (path) => location.pathname === path;

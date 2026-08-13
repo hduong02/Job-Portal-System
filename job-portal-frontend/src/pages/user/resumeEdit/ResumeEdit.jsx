@@ -24,6 +24,9 @@ import ProjectSection from "./ProjectSection";
 import ResumeSettingsSection from "./ResumeSettingsSection";
 import LanguagesSection from "./LanguagesSection";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { fetchResumeById } from "../../../redux-store/resume/resumeThunk";
 
 import { resumes } from "../resumes/resumeData";
 
@@ -49,14 +52,19 @@ const SECTIONS = [
   { key: "settings", label: "Settings", icon: Settings, field: null },
 ];
 
-
-
 const ResumeEdit = () => {
   const [activeSection, setActiveSection] = useState(SECTIONS[0]);
   const { id } = useParams();
-  const resume = resumes[1]
+  const { currentResume:resume } = useSelector((store) => store.resume);
+  const dispatch = useDispatch();
 
-  console.log("resume id", id);
+  useEffect(() => {
+    if(id){
+      dispatch(fetchResumeById(id));
+    }
+    
+  }, [id]);
+
   return (
     <div className="flex flex-col h-[95vh] w-full">
       <div className="flex flex-1 overflow-hidden">

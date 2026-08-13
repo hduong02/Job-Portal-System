@@ -8,15 +8,35 @@ import { Briefcase } from "lucide-react";
 import { DollarSign } from "lucide-react";
 import { Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
 import { Separator } from "@/components/ui/separator";
-
 import { ExternalLink } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchJobById } from "../../../reduxt-store/job/jobThunk";
+import { useSelector } from "react-redux";
+import { unsaveJob } from "../../../reduxt-store/saveJobs/saveJobThunk";
+
+
 const SavedJobCard = ({ savedJob }) => {
   const [job, setJob] = useState(savedJob.job);
+  const dispatch = useDispatch();
+
+  const fetchJob = async (jobId) => {
+    const result=await dispatch(fetchJobById(jobId));
+    const job= result.payload
+    setJob(job)
+  };
+
+  useEffect(() => {
+    const jobId = savedJob?.jobId;
+
+    if (jobId) {
+      fetchJob(jobId)
+    }
+  }, [savedJob]);
 
   if (!job) {
     return (
@@ -31,7 +51,7 @@ const SavedJobCard = ({ savedJob }) => {
     .join(", ");
 
   const handleUnsaved = () => {
-    
+    dispatch(unsaveJob(savedJob.id));
   };
 
   return (

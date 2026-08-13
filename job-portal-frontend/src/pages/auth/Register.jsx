@@ -9,17 +9,21 @@ import { Input } from "../../components/ui/input";
 import { cn } from "../../lib/utils";
 import { Mail } from "lucide-react";
 import { Lock } from "lucide-react";
-
 import RoleButton from "./RoleButton";
 import { Button } from "../../components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../../redux-store/user/userThunk";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Register = () => {
 
   const navigate=useNavigate();
-
+  const dispatch=useDispatch()
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -40,8 +44,15 @@ const Register = () => {
   const selectedRole = watch("role");
 
   const onSubmit = async (data) => {
+    dispatch(registerUser(data))
     console.log("register form data", data);
   };
+
+    useEffect(() => {
+      if (isAuthenticated && user) {
+        navigate("/");
+      }
+    }, [isAuthenticated, user]);
 
   return (
     <AuthLayout

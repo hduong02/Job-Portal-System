@@ -10,12 +10,25 @@ import { Button } from "../../../components/ui/button";
 import { ArrowRight } from "lucide-react";
 import ApplicationTable from "../applications/ApplicationTable";
 
-import { recent as applications } from "./recentApplications"
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchCompanyApplications } from "../../../redux-store/application/applicationThunk";
+
+// import { recent as applications } from "./recentApplications"
 
 const RecentApplicationTable = () => {
+  const { applications } = useSelector((store) => store.application);
+  const dispatch = useDispatch();
+
   const recent = [...applications]
     .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt))
     .slice(0, 5);
+
+  useEffect(() => {
+    const filters = {};
+    dispatch(fetchCompanyApplications(filters));
+  }, []);
 
   return (
     <Card>

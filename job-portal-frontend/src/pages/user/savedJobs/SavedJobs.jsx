@@ -4,10 +4,22 @@ import { Briefcase } from "lucide-react";
 
 import SavedJobCard from "./SavedJobCard";
 import { Button } from "../../../components/ui/button";
-import { savedJobs } from "./dummySavedJobs";
+
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchMySavedJobs } from "../../../redux-store/saveJobs/saveJobThunk";
+import { useSelector } from "react-redux";
+
+// import { savedJobs } from "./dummySavedJobs";
 
 const SavedJobs = () => {
+  const dispatch=useDispatch()
+  const {savedJobs}=useSelector(store=>store.savedJob)
 
+  useEffect(()=>{
+    dispatch(fetchMySavedJobs())
+  },[])
+  
   return (
     <div className="max-w-5xl min-w-5xl max-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center">

@@ -32,10 +32,21 @@ import { Edit2 } from "lucide-react";
 import { Delete } from "lucide-react";
 import { XCircle } from "lucide-react";
 
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import {
+  closeJob,
+  fetchJobs,
+  fetchMyJobs,
+  publishJob,
+} from "../../../reduxt-store/job/jobThunk";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { fetchMyCompany } from "../../../reduxt-store/company/companyThunk";
 
-import { jobs } from "./dummyJobs"
+
+// import { jobs } from "./dummyJobs"
 
 function fmtDate(dt) {
   if (!dt) return "—";
@@ -51,6 +62,9 @@ const EmployerJobs = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = React.useState("ALL");
   const [search, setSearch] = useState("");
+  const { myJobs: jobs } = useSelector((state) => state.job);
+  const { myCompany } = useSelector((state) => state.company);
+  const dispatch = useDispatch();
 
   const stats = useMemo(
     () => ({
@@ -77,12 +91,18 @@ const EmployerJobs = () => {
 
 
   const handlePublishJob = (id) => {
-    
-  };
-  const handleCloseJob = (id) => {
-    
+    dispatch(publishJob(id));
   };
 
+  const handleCloseJob = (id) => {
+    dispatch(closeJob(id));
+  };
+
+  useEffect(() => {
+    if (myCompany) {
+      dispatch(fetchMyJobs(myCompany?.id));
+    }
+  }, [myCompany]);
 
   return (
     <div className="space-y-6">

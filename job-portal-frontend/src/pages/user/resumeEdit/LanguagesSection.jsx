@@ -1,33 +1,37 @@
 import React from "react";
-
 import CopyFromMenu from "./shared/CopyFromMenu";
 import { resumes } from "../resumes/resumeData";
 import AddButton from "./shared/AddButton";
 import { useState } from "react";
-
 import SectionDialog from "./shared/SectionDialog";
 import FRow from "./shared/FRow";
 import { Input } from "../../../components/ui/input";
-
 import DeleteConfirm from "./shared/DeleteConfirm";
-
 import { Pencil } from "lucide-react";
 import { Trash2 } from "lucide-react";
-
 import { useEffect } from "react";
 
-import { languages } from "./shared/languageData";
+import { useDispatch } from "react-redux";
+import {
+  addLanguage,
+  deleteLanguage,
+  updateLanguage,
+} from "../../../redux-store/resume/resumeThunk";
+
+// import { languages } from "./shared/languageData";
 
 const languageData = {
   languageName: "",
   proficiency: "PROFESSIONAL",
 };
 
-const LanguagesSection = () => {
+const LanguagesSection = ({ resumeId, resume }) => {
   const [open, setOpen] = useState(false);
   const [delItem, setDel] = useState(null);
   const [edit, setEdit] = useState(null);
   const [form, setForm] = useState(languageData);
+  const dispatch = useDispatch();
+  const languages = resume.languages;
 
   const openEdit = (item) => {
     setEdit(item);
@@ -41,11 +45,17 @@ const LanguagesSection = () => {
   };
 
   const save = () => {
+    const thunk = edit
+      ? updateLanguage({ resumeId, languageId: edit.id, data: form })
+      : addLanguage({ resumeId, data: form });
+
+    dispatch(thunk);
     console.log("save project", form);
   };
   const f = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const handleDelete = () => {
+    dispatch(deleteLanguage({ resumeId, languageId: delItem.id }));
     console.log("deleting", delItem);
   };
 
@@ -62,6 +72,7 @@ const LanguagesSection = () => {
       setForm(edit);
     }
   }, [edit]);
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

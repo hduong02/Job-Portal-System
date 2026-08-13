@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
+import { useDispatch } from "react-redux";
+import { createCategory, updateCategory } from "../../../redux/slices/categorySlice";
 
 const CategoryFormDialog = ({
   isEdit,
@@ -27,6 +29,7 @@ const CategoryFormDialog = ({
   initialData,
   rootCategories,
 }) => {
+  const dispatch = useDispatch();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -37,8 +40,17 @@ const CategoryFormDialog = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (initialData) {
+    console.log("initial data handle submit", initialData)
 
+    if (initialData) {
+      dispatch(
+        updateCategory({
+          id: initialData.id,
+          ...form,
+        }),
+      );
+    } else {
+      dispatch(createCategory(form));
     }
 
     console.log("form data", form, isEdit);

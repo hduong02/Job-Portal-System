@@ -9,9 +9,10 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
-
 import { Button } from "../../../components/ui/button";
 
+import { useDispatch } from 'react-redux';
+import { createTag, updateTag } from '../../../redux-store/jobMeta/jobMetaThunk';
 
 const TagFormDialog = ({
   isEdit,
@@ -21,16 +22,23 @@ const TagFormDialog = ({
   initialData,
 }) => {
 
+  const dispatch=useDispatch()
   const [form, setForm] = useState({
       name: "",
       category: "",
     });
   
-    const handleSubmit = (e) => {
-      e.preventDefault();
+      const handleSubmit = (e) => {
+        e.preventDefault();
 
-      console.log("form data", form);
-    };
+        if(initialData){
+          dispatch(updateTag({
+            id:initialData.id,
+            ...form
+          }))
+        } else dispatch(createTag(form))
+        console.log("form data", form);
+      };
   
     useEffect(() => {
       if (open) {

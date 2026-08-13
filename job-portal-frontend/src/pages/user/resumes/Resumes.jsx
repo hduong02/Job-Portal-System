@@ -7,12 +7,21 @@ import { Star } from "lucide-react";
 import ResumeCard from "./ResumeCard";
 import { useState } from "react";
 import CreateResumeDialog from "./CreateResumeDialog";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+import { fetchMyResumes, setDefaultResume } from "../../../redux-store/resume/resumeThunk";
 
-import { resumes } from "./resumeData.js";
+// import { resumes } from "./resumeData.js";
 
 const Resumes = () => {
   const [showCreate, setShowCreate] = useState(false);
+  const { resumes } = useSelector((store) => store.resume);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchMyResumes());
+  }, []);
 
   const defaultResume=resumes.find((r)=>r.isDefault)
   
@@ -37,7 +46,7 @@ const Resumes = () => {
           </Button>
         </div>
 
-        {<div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+        {defaultResume && <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 flex items-center gap-3">
           <Star className="h-5 w-5 text-yellow-500 fill-current shrink-0" />
           <div>
             <p className="text-sm font-semibold text-yellow-800">

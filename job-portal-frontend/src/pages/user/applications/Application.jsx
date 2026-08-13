@@ -14,10 +14,17 @@ import {
 import { useState } from "react";
 import ApplicationCard from "./ApplicationCard";
 
-import { myApplications } from "./dummyApplication";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchMyApplications, withdrawApplication } from "../../../redux-store/application/applicationThunk";
+import { useSelector } from "react-redux";
+
+// import { myApplications } from "./dummyApplication";
 
 const Application = () => {
   const [selectedTab, setSelectedTab] = useState("all");
+  const dispatch = useDispatch();
+  const {myApplications}=useSelector(store=>store.application)
 
   const stats = {
     total: 5,
@@ -25,6 +32,10 @@ const Application = () => {
     shortlisted: 3,
     hired: 1,
   };
+
+  useEffect(() => {
+    dispatch(fetchMyApplications());
+  }, []);
 
   return (
     <div className="max-w-5xl min-w-5xl max-auto px-4 sm:px-6 lg:px-8 py-8">

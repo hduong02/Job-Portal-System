@@ -6,19 +6,23 @@ import { Textarea } from "../../../components/ui/textarea";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateResumeSummary } from "../../../redux-store/resume/resumeThunk";
 
-const SummarySection = () => {
+const SummarySection = ({ resumeId, resume }) => {
   const [text, setText] = useState("");
+  const dispatch = useDispatch();
 
   const handleSave = () => {
-
+    dispatch(updateResumeSummary({ resumeId, summary: text }));
     console.log("summary text - ", text);
   };
-  // useEffect(() => {
-  //   if (resume.summary) {
-  //     setText(resume.summary);
-  //   }
-  // }, [resume]);
+  
+  useEffect(() => {
+    if (resume.summary) {
+      setText(resume.summary);
+    }
+  }, [resume]);
   
   return (
     <div className="space-y-3">

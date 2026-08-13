@@ -13,8 +13,14 @@ import { Globe } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Check } from "lucide-react";
 
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { updatePersonalInfo } from "../../../redux-store/resume/resumeThunk";
+import { uploadToCloudinary } from "../../../utils/uploadToCloudinary";
 
-const PersonalInfoSection = () => {
+const PersonalInfoSection = ( {resumeId,resume} ) => {
+  const pi=resume?.personalInfo??{}
+  const dispatch=useDispatch()
 
   const [form, setForm] = useState({
     firstName: "",
@@ -42,44 +48,42 @@ const PersonalInfoSection = () => {
     }
     try {
       setIsUploadingImage(true)
+      const url=await uploadToCloudinary(file)
       setForm((prev)=>({...prev,profileImage:url}))
-      
-      
     } catch (error) {
       console.log("image uploading error",error)
     }finally{
       setIsUploadingImage(false)
     }
-    console.log(event.target.value);
   };
   const f = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
 
   const handleSave=()=>{
-    
-    console.log("form ",form)
+    dispatch(updatePersonalInfo({resumeId, data:form}))
+    console.log("form ", form)
   }
 
-  // useEffect(()=>{
+  useEffect(()=>{
 
-  //   if(pi){
-  //     setForm({
-  //       firstName:pi.firstName??"",
-  //       lastName: pi.lastName ?? "",
-  //       headline: pi.headline ?? "",
-  //       email: pi.email ?? "",
-  //       phone: pi.phone ?? "",
-  //       city: pi.city ?? "",
-  //       country: pi.country ?? "",
-  //       linkedinUrl: pi.linkedinUrl ?? "",
-  //       githubUrl: pi.githubUrl ?? "",
-  //       portfolioUrl: pi.portfolioUrl ?? "",
-  //       websiteUrl: pi.websiteUrl ?? "",
-  //       profileImage: pi.profileImage ?? "",
-  //     })
-  //   }
+    if(pi){
+      setForm({
+        firstName:pi.firstName??"",
+        lastName: pi.lastName ?? "",
+        headline: pi.headline ?? "",
+        email: pi.email ?? "",
+        phone: pi.phone ?? "",
+        city: pi.city ?? "",
+        country: pi.country ?? "",
+        linkedinUrl: pi.linkedinUrl ?? "",
+        githubUrl: pi.githubUrl ?? "",
+        portfolioUrl: pi.portfolioUrl ?? "",
+        websiteUrl: pi.websiteUrl ?? "",
+        profileImage: pi.profileImage ?? "",
+      })
+    }
 
-  // },[resume])
+  },[resume])
 
   return (
     <div className="space-y-4">
