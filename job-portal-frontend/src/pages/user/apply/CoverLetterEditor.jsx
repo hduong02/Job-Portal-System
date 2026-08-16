@@ -8,9 +8,11 @@ import { Copy } from "lucide-react";
 import { RotateCcw } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
-const handleCopy = () => {
-  navigator.clipboard.writeText(coverLetter);
-};
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchResumeById } from "../../../redux-store/resume/resumeThunk";
+import { generateCoverLetter } from "../../../redux-store/ai/aiThunk";
 
 const tips = [
   "Highlight your most relevant skills and how they align with the role",
@@ -18,7 +20,57 @@ const tips = [
   "Show enthusiasm for the company and why you want to join",
   "Keep it concise — 3 to 4 focused paragraphs",
 ];
+
 const CoverLetterEditor = ({ coverLetter, setCoverLetter, selectedResume }) => {
+  const { currentJob: job } = useSelector((store) => store.job);
+  const { user } = useSelector((store) => store.auth);
+  const { currentResume } = useSelector((store) => store.resume);
+  const dispatch = useDispatch();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(coverLetter);
+  };
+
+  useEffect(() => {
+    if (selectedResume) {
+      dispatch(fetchResumeById(selectedResume));
+    }
+  }, [selectedResume]);
+
+  const handleGenerateCoverLatterWithAi = async () => {
+    const resume = currentResume;
+
+    const candidateSkills =
+      resume?.skills?.map((s) => s.skillName).filter(Boolean) ?? [];
+
+    const candidateExperience =
+      resume?.workExperiences
+        ?.map(
+          (e) =>
+            `${e.jobTitle} at ${e.companyName}${e.isCurrent ? " (current)" : ""}`,
+        )
+        .filter(Boolean) ?? [];
+
+    const payload = {
+      jobTitle: job?.title || "Software Engineer",
+      jobDescription: job?.description || "",
+
+      candidateName: user ? user.fullName : "",
+      targetCompanyName: job?.companyId ? `Company #${job.companyId}` : "",
+      candidateSummary: resume?.summary,
+      candidateSkills: candidateSkills,
+      candidateExperience: candidateExperience,
+    };
+
+    try {
+      const result = await dispatch(generateCoverLetter(payload)).unwrap();
+      console.log("result --- ", result)
+      setCoverLetter(result.content);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -48,10 +100,10 @@ const CoverLetterEditor = ({ coverLetter, setCoverLetter, selectedResume }) => {
                 tailored to this position.
               </p>
               <Button
-                // onClick={handleGenerateCoverLatterWithAi}
+                onClick={handleGenerateCoverLatterWithAi}
                 className={"py-5"}
               >
-                <Sparkles className="w-4 h-4" /> Generrate with Ai
+                <Sparkles className="w-4 h-4" /> Generate with AI
               </Button>
             </div>
           </div>

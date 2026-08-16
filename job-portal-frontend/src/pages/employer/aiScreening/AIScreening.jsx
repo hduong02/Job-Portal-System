@@ -19,10 +19,19 @@ import { Badge } from "../../../components/ui/badge";
 import { Eye } from "lucide-react";
 import CandidateRow from "./CandidateRow";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { fetchMyJobs } from "../../../reduxt-store/job/jobThunk";
+import { fetchMyCompany } from "../../../reduxt-store/company/companyThunk";
+import { fetchCompanyApplications } from "../../../reduxt-store/application/applicationThunk";
 
-import { applications } from "../applications/applications.js";
+// import { applications } from "../applications/applications.js";
 
 const AIScreening = () => {
+  const { applications } = useSelector((store) => store.application);
+  const { myCompany } = useSelector((state) => state.company);
+  const dispatch = useDispatch();
+
   const stats = useMemo(() => {
     const total = applications.length;
     const screened = (a) => a.screening != null;
@@ -74,6 +83,24 @@ const AIScreening = () => {
       topAutoShortlisted,
       topNeedsReview,
     };
+  }, [applications]);
+
+  useEffect(() => {
+    if (myCompany) {
+      dispatch(fetchMyJobs(myCompany?.id));
+    }
+  }, [myCompany]);
+
+  useEffect(() => {
+    dispatch(fetchMyCompany());
+  }, []);
+  
+  useEffect(() => {
+    const filters = {};
+
+    console.log("filters ----- ", filters);
+
+    dispatch(fetchCompanyApplications(filters));
   }, []);
 
   return (

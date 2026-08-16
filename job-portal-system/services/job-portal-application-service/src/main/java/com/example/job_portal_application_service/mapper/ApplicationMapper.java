@@ -5,11 +5,13 @@ import java.util.List;
 import com.example.domain.ApplicationStatus;
 import com.example.dto.response.ApplicationNoteResponse;
 import com.example.dto.response.ApplicationResponse;
+import com.example.dto.response.ApplicationScreeningResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
 import com.example.dto.response.UserResponse;
 import com.example.job_portal_application_service.model.Application;
 import com.example.job_portal_application_service.model.ApplicationNote;
+import com.example.job_portal_application_service.model.ApplicationScreening;
 import com.example.job_portal_application_service.payload.CreateApplicationRequest;
 
 public class ApplicationMapper {
@@ -40,7 +42,8 @@ public class ApplicationMapper {
             List<ApplicationNote> notes,
             JobResponse job,
             CompanyResponse company,
-            UserResponse candidate) {
+            UserResponse candidate,
+            ApplicationScreening screening) {
 
         return ApplicationResponse.builder()
                 .id(application.getId())
@@ -63,6 +66,27 @@ public class ApplicationMapper {
                 .withdrawnReason(application.getWithdrawnReason())
                 .appliedAt(application.getAppliedAt())
                 .updatedAt(application.getUpdatedAt())
+                .screening(toScreeningResponse(screening))
+                .build();
+    }
+
+    public static ApplicationScreeningResponse toScreeningResponse(
+            ApplicationScreening s) {
+        if (s == null) return null;
+
+        return ApplicationScreeningResponse.builder()
+                .id(s.getId())
+                .overallScore(s.getOverallScore())
+                .skillsMatchScore(s.getSkillsMatchScore())
+                .experienceMatchScore(s.getExperienceMatchScore())
+                .educationMatchScore(s.getEducationMatchScore())
+                .shortListStatus(s.getShortListStatus())
+                .summary(s.getSummary())
+                .matchedSkills(s.getMatchedSkills())
+                .missingSkills(s.getMissingSkills())
+                .strengths(s.getStrengths())
+                .concerns(s.getConcerns())
+                .screenedAt(s.getScreenedAt())
                 .build();
     }
 

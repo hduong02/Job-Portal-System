@@ -25,7 +25,7 @@ public class ApplicationController {
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestBody @Valid CreateApplicationRequest createApplicationRequest) 
+            @RequestBody @Valid CreateApplicationRequest createApplicationRequest)
             throws Exception {
         return ResponseEntity.ok(
                 applicationService.createApplication(candidateId, createApplicationRequest)

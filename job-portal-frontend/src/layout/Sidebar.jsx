@@ -5,12 +5,17 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { cn } from "../lib/utils";
 import { LogOut } from "lucide-react";
 
+import { useDispatch } from "react-redux";
+import { logout } from "../redux-store/user/userSlice";
+
 const Sidebar = ({ navigation }) => {
   const navigate=useNavigate();
+  const dispatch=useDispatch();
 
   const handleLogout=()=>{
-      navigate("/")
-    }
+    dispatch(logout())
+    navigate("/")
+  }
   return (
     <div className="relative flex flex-col bg-slate-950 transition-all duration-300 shrink-0 w-64">
       {/* Brand Logo */}

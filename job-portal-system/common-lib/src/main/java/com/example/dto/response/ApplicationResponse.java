@@ -43,12 +43,12 @@ public class ApplicationResponse {
     private LocalDateTime withdrawnAt;
     private String withdrawnReason;
 
-
     private Integer aiScore;
 
-    private AiShortListStatus aishortListStatus;
+    private AiShortListStatus aiShortListStatus;
 
     private LocalDateTime appliedAt;
     private LocalDateTime updatedAt;
 
+    private ApplicationScreeningResponse screening;
 }

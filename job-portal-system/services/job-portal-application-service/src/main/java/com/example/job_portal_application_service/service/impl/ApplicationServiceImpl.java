@@ -18,12 +18,15 @@ import com.example.job_portal_application_service.client.UserClient;
 import com.example.job_portal_application_service.mapper.ApplicationMapper;
 import com.example.job_portal_application_service.model.Application;
 import com.example.job_portal_application_service.model.ApplicationNote;
+import com.example.job_portal_application_service.model.ApplicationScreening;
 import com.example.job_portal_application_service.payload.CompanyApplicationFilterRequest;
 import com.example.job_portal_application_service.payload.CreateApplicationRequest;
 import com.example.job_portal_application_service.payload.WithdrawApplicationRequest;
 import com.example.job_portal_application_service.repository.ApplicationNoteRepository;
 import com.example.job_portal_application_service.repository.ApplicationRepository;
+import com.example.job_portal_application_service.repository.ApplicationScreeningRepository;
 import com.example.job_portal_application_service.repository.ApplicationSpecification;
+import com.example.job_portal_application_service.service.ApplicationScreeningService;
 import com.example.job_portal_application_service.service.ApplicationService;
 
 import java.util.List;
@@ -35,6 +38,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ApplicationRepository applicationRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
+    private final ApplicationScreeningService applicationScreeningService;
+    private final ApplicationScreeningRepository applicationScreeningRepository;
     private final JobClient jobClient;
     private final ResumeClient resumeClient;
     private final CompanyClient companyClient;
@@ -66,6 +71,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         );
 
         Application savedApplication = applicationRepository.save(application);
+
+        applicationScreeningService.screenAsync(
+                savedApplication.getId(),
+                candidateId,
+                req.getJobId(),
+                req.getResumeId()
+        );
 
         return buildFullResponse(savedApplication);
     }
@@ -191,13 +203,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         List<ApplicationNote> notes = applicationNoteRepository
                 .findByApplicationId(application.getId());
+        
+        ApplicationScreening screening = applicationScreeningRepository
+                .findByApplicationId(application.getId());
 
         return ApplicationMapper.toResponse(
                 application,
                 notes,
                 job,
                 company,
-                candidate
+                candidate,
+                screening
         );
     }
     
