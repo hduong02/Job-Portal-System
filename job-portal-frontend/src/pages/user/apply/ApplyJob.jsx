@@ -12,7 +12,7 @@ import AdditionalDetails from "./AdditionalDetails";
 import ReviewSubmission from "./ReviewSubmission";
 import SelectResume from "./SelectResume";
 import { useDispatch } from "react-redux";
-import { submitApplication } from "../../../reduxt-store/application/applicationThunk";
+import { submitApplication } from "../../../redux-store/application/applicationThunk";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchJobById } from "../../../redux-store/job/jobThunk";

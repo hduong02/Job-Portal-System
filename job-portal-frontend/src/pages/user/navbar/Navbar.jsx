@@ -23,7 +23,7 @@ import { Bookmark } from "lucide-react";
 import { ScrollText } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../../reduxt-store/user/userSlice";
+import { logout } from "../../../redux-store/user/userSlice";
 
 // const user =   {
 //     authProvider: "LOCAL",

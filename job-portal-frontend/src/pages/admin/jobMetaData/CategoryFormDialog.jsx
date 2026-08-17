@@ -19,7 +19,10 @@ import {
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
 import { useDispatch } from "react-redux";
-import { createCategory, updateCategory } from "../../../redux/slices/categorySlice";
+import {
+  createCategory,
+  updateCategory,
+} from "../../../redux-store/jobMeta/jobMetaThunk";
 
 const CategoryFormDialog = ({
   isEdit,

@@ -21,9 +21,9 @@ import CandidateRow from "./CandidateRow";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { fetchMyJobs } from "../../../reduxt-store/job/jobThunk";
-import { fetchMyCompany } from "../../../reduxt-store/company/companyThunk";
-import { fetchCompanyApplications } from "../../../reduxt-store/application/applicationThunk";
+import { fetchMyJobs } from "../../../redux-store/job/jobThunk";
+import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
+import { fetchCompanyApplications } from "../../../redux-store/application/applicationThunk";
 
 // import { applications } from "../applications/applications.js";
 

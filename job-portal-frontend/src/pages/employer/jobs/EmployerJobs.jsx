@@ -40,10 +40,10 @@ import {
   fetchJobs,
   fetchMyJobs,
   publishJob,
-} from "../../../reduxt-store/job/jobThunk";
+} from "../../../redux-store/job/jobThunk";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { fetchMyCompany } from "../../../reduxt-store/company/companyThunk";
+import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
 
 
 // import { jobs } from "./dummyJobs"

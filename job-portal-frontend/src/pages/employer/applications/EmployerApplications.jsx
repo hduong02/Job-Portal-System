@@ -21,7 +21,7 @@ import UpdateStatusDialog from "./UpdateStatusDialog";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchCompanyApplications } from "../../../redux-store/application/applicationThunk";
-import { useState } from "react";
+
 import { useSelector } from "react-redux";
 import { fetchMyJobs } from "../../../redux-store/job/jobThunk";
 import { fetchMyCompany } from "../../../redux-store/company/companyThunk";

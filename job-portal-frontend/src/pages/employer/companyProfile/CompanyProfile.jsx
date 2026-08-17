@@ -3,7 +3,7 @@ import ProfileHeader from "./ProfileHeader";
 import CompanyDetails from "./CompanyDetails";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+
 import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
 import { useSelector } from "react-redux";
 import CreateCompanyForm from "./CreateCompanyForm";

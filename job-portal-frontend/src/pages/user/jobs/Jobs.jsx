@@ -20,9 +20,9 @@ import JobCard from "./JobCard";
 
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { fetchJobs } from "../../../reduxt-store/job/jobThunk";
+import { fetchJobs } from "../../../redux-store/job/jobThunk";
 import { useSelector } from "react-redux";
-import { enhanceSearch } from "../../../reduxt-store/ai/aiThunk";
+import { enhanceSearch } from "../../../redux-store/ai/aiThunk";
 import { useMemo } from "react";
 // import { jobs } from './dummyjobs';
 

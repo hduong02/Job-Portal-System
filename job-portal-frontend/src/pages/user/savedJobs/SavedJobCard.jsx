@@ -15,9 +15,9 @@ import { useState } from "react";
 
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchJobById } from "../../../reduxt-store/job/jobThunk";
+import { fetchJobById } from "../../../redux-store/job/jobThunk";
 import { useSelector } from "react-redux";
-import { unsaveJob } from "../../../reduxt-store/saveJobs/saveJobThunk";
+import { unsaveJob } from "../../../redux-store/saveJobs/saveJobThunk";
 
 
 const SavedJobCard = ({ savedJob }) => {

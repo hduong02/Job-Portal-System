@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import UserFilter from "./UserFilter";
 import UserTable from "./UserTable";
 
-import { fetchAllUsers } from "../../../redux/slices/adminUserSlice";
+import { fetchAllUsers } from "../../../redux-store/adminUser/adminThunk";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 

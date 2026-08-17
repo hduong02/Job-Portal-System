@@ -9,7 +9,7 @@ import UserTable from "../users/UserTable";
 // import {users} from "./userData"
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { fetchAllUsers } from "../../../redux/slices/adminUserSlice";
+import { fetchAllUsers } from "../../../redux-store/adminUser/adminThunk";
 
 const AdminDashboard = () => {
   const {users}=useSelector(state=>state.adminUser)

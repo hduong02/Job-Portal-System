@@ -8,7 +8,7 @@ import { Save } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateCompany } from "../../../reduxt-store/company/companyThunk";
+import { updateCompany } from "../../../redux-store/company/companyThunk";
 
 const CompanyDetails = () => {
 

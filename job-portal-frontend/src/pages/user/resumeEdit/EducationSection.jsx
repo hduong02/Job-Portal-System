@@ -20,7 +20,7 @@ import {
   deleteEducation,
   updateEducation,
   updateWorkExperience,
-} from "../../../reduxt-store/resume/resumeThunk";
+} from "../../../redux-store/resume/resumeThunk";
 
 // import { educations } from "./shared/educationData";
 

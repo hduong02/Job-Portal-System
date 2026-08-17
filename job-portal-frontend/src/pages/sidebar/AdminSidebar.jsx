@@ -5,7 +5,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { LogOut } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../redux/slices/authSlice';
+import { logout } from '../../redux-store/user/userSlice';
 
 const AdminSidebar = ({navigation}) => {
 
