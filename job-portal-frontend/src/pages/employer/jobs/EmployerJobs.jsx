@@ -37,13 +37,12 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import {
   closeJob,
-  fetchJobs,
   fetchMyJobs,
   publishJob,
 } from "../../../redux-store/job/jobThunk";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
+import PageControls from "../../../components/PageControls";
 
 
 // import { jobs } from "./dummyJobs"
@@ -62,19 +61,21 @@ const EmployerJobs = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = React.useState("ALL");
   const [search, setSearch] = useState("");
-  const { myJobs: jobs } = useSelector((state) => state.job);
+  const [page, setPage] = useState(0);
+  const { myJobs: jobs, myJobsPage, isLoading, jobError } = useSelector((state) => state.job);
   const { myCompany } = useSelector((state) => state.company);
+  const companyId = myCompany?.id;
   const dispatch = useDispatch();
 
   const stats = useMemo(
     () => ({
-      total: jobs.length,
+      total: myJobsPage.totalElements,
       open: jobs.filter((job) => job.status === "OPEN").length,
       draft: jobs.filter((job) => job.status === "DRAFT").length,
       closed: jobs.filter((job) => job.status === "CLOSED").length,
       appTotal: jobs.reduce((acc, job) => acc + job.applicationCount, 0),
     }),
-    [jobs],
+    [jobs, myJobsPage.totalElements],
   );
 
   const filteredJobs = useMemo(() => {
@@ -99,10 +100,10 @@ const EmployerJobs = () => {
   };
 
   useEffect(() => {
-    if (myCompany) {
-      dispatch(fetchMyJobs(myCompany?.id));
+    if (companyId) {
+      dispatch(fetchMyJobs({ companyId, page }));
     }
-  }, [myCompany]);
+  }, [dispatch, companyId, page]);
 
   return (
     <div className="space-y-6">
@@ -131,19 +132,19 @@ const EmployerJobs = () => {
           color="bg-blue-50 text-primary"
         />
         <StateCard
-          label="Active (Open)"
+          label="Open on Page"
           value={stats.open}
           icon={TrendingUp}
           color="bg-yellow-50 text-warning"
         />
         <StateCard
-          label="Draft"
+          label="Draft on Page"
           value={stats.draft}
           icon={Clock}
           color="bg-green-50 text-success"
         />
         <StateCard
-          label="Total Applications"
+          label="Applications on Page"
           value={stats.appTotal}
           icon={Users}
           color="bg-purple-50 text-info"
@@ -208,7 +209,7 @@ const EmployerJobs = () => {
             {filteredJobs.map((job) => {
               const location = [job.city, job.state, job.country].join(", ");
               return (
-                <TableRow>
+                <TableRow key={job.id}>
                   <TableCell>
                     <p className="font-medium text-slate-900 text-sm">
                       {job.title}
@@ -284,6 +285,8 @@ const EmployerJobs = () => {
           </TableBody>
         </Table>
       </section>
+      {jobError && <p className="text-sm text-red-600">{jobError}</p>}
+      <PageControls page={myJobsPage} onPageChange={setPage} loading={isLoading} />
     </div>
   );
 };

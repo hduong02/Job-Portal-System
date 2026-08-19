@@ -2,6 +2,8 @@ package com.example.job_portal_user_service.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.domain.UserStatus;
 import com.example.dto.response.UserResponse;
@@ -12,7 +14,6 @@ import com.example.job_portal_user_service.repository.UserRepository;
 import com.example.job_portal_user_service.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +39,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

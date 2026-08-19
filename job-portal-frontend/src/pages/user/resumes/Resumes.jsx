@@ -10,18 +10,20 @@ import CreateResumeDialog from "./CreateResumeDialog";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { fetchMyResumes, setDefaultResume } from "../../../redux-store/resume/resumeThunk";
+import { fetchMyResumes } from "../../../redux-store/resume/resumeThunk";
+import PageControls from "../../../components/PageControls";
 
 // import { resumes } from "./resumeData.js";
 
 const Resumes = () => {
   const [showCreate, setShowCreate] = useState(false);
-  const { resumes } = useSelector((store) => store.resume);
+  const [page, setPage] = useState(0);
+  const { resumes, resumesPage, loading, error } = useSelector((store) => store.resume);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchMyResumes());
-  }, []);
+    dispatch(fetchMyResumes({ page }));
+  }, [dispatch, page]);
 
   const defaultResume=resumes.find((r)=>r.isDefault)
   
@@ -64,7 +66,7 @@ const Resumes = () => {
         {/* list of resume */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {resumes.map((item) => (
-            <ResumeCard resume={item} />
+            <ResumeCard key={item.id} resume={item} />
           ))}
 
           <button
@@ -80,6 +82,8 @@ const Resumes = () => {
             </div>
           </button>
         </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <PageControls page={resumesPage} onPageChange={setPage} loading={loading} />
       </div>
 
       <CreateResumeDialog

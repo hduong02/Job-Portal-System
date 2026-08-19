@@ -3,6 +3,8 @@ package com.example.job_portal_job_service.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.domain.JobStatus;
 import com.example.dto.request.JobRequest;
@@ -26,9 +28,7 @@ import com.example.job_portal_job_service.service.JobTagService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,17 +94,14 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobResponse> getJobs(JobSearchRequest request) {
-        List<Job> jobs = jobRepository.findAll(JobSpecification.build(request));
-        return jobs.stream().map(this::convertToResponse)
-                .collect(Collectors.toList());
+    public Page<JobResponse> getJobs(JobSearchRequest request, Pageable pageable) {
+        return jobRepository.findAll(JobSpecification.build(request), pageable)
+                .map(this::convertToResponse);
     }
 
     @Override
-    public List<JobResponse> getJobsByCompany(Long companyId) {
-        List<Job> jobs = jobRepository.findByCompanyId(companyId);
-        return jobs.stream().map(this::convertToResponse)
-                .collect(Collectors.toList());
+    public Page<JobResponse> getJobsByCompany(Long companyId, Pageable pageable) {
+        return jobRepository.findByCompanyId(companyId, pageable).map(this::convertToResponse);
     }
 
     @Override
@@ -183,10 +180,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobResponse> getAllJobsAdmin() {
-        return jobRepository.findAll().stream().map(
-                this::convertToResponse
-        ).collect(Collectors.toList());
+    public Page<JobResponse> getAllJobsAdmin(Pageable pageable) {
+        return jobRepository.findAll(pageable).map(this::convertToResponse);
     }
 
     private JobResponse convertToResponse(Job savedJob) {

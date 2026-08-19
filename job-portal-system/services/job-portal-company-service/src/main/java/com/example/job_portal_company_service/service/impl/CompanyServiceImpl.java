@@ -2,6 +2,8 @@ package com.example.job_portal_company_service.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.domain.CompanyStatus;
 import com.example.domain.CompanyType;
@@ -113,18 +115,18 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyResponse> getAllCompanies(
+    public Page<CompanyResponse> getAllCompanies(
             CompanyType companyType,
             IndustryType industryType,
-            CompanyStatus companyStatus
+            CompanyStatus companyStatus,
+            Pageable pageable
     ) {
         return companyRepository.findByFilters(
                 companyType,
                 industryType,
-                companyStatus
-        ).stream()
-                .map(CompanyMapper::toResponse)
-                .collect(Collectors.toList());
+                companyStatus,
+                pageable
+        ).map(CompanyMapper::toResponse);
     }
 
     @Override

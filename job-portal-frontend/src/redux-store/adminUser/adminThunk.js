@@ -4,9 +4,9 @@ import api from "../api"
 
 export const fetchAllUsers = createAsyncThunk(
   "adminUser/fetchAllUsers",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const { data } = await api.get(`/api/users`)
+      const { data } = await api.get(`/api/users`, { params })
 
       console.log("fetched users", data)
       return data

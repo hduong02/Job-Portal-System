@@ -1,6 +1,7 @@
 package com.example.job_portal_application_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.domain.ApplicationStatus;
 import com.example.dto.response.ApplicationResponse;
@@ -18,12 +19,12 @@ public interface ApplicationService {
 
     ApplicationResponse getApplicationById(Long id) throws Exception;
 
-    List<ApplicationResponse> getMyApplications(Long candidateId);
+    Page<ApplicationResponse> getMyApplications(Long candidateId, Pageable pageable);
 
-    List<ApplicationResponse> getApplicationsForJob(Long jobId);
+    Page<ApplicationResponse> getApplicationsForJob(Long jobId, Pageable pageable);
 
-    List<ApplicationResponse> getApplicationsForCompany(Long userId,
-            CompanyApplicationFilterRequest filter);
+    Page<ApplicationResponse> getApplicationsForCompany(Long userId,
+            CompanyApplicationFilterRequest filter, Pageable pageable);
 
     ApplicationResponse updateStatus(
             Long applicationId,

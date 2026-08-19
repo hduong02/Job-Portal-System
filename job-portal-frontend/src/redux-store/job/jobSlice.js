@@ -11,14 +11,18 @@ import {
   updateJob,
 } from "./jobThunk";
 import { replaceInList } from "../utils/replaceInList";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   jobs: [],
+  jobsPage: emptyPage,
   jobLoading: false,
   jobError: null,
   adminJobs: [],
+  adminJobsPage: emptyPage,
   adminJobLoading: false,
   myJobs: [],
+  myJobsPage: emptyPage,
   currentJob: null,
   isLoading: false,
   error: null,
@@ -37,7 +41,9 @@ const jobSlice = createSlice({
       })
       .addCase(fetchJobs.fulfilled, (state, action) => {
         state.jobLoading = false;
-        state.jobs = action.payload;
+        const result = pageResult(action.payload);
+        state.jobs = result.content;
+        state.jobsPage = result.page;
         state.jobError = null;
       })
       .addCase(fetchJobs.rejected, (state, action) => {
@@ -53,7 +59,9 @@ const jobSlice = createSlice({
       })
       .addCase(fetchAllJobsAdmin.fulfilled, (s, { payload }) => {
         s.adminJobLoading = false;
-        s.adminJobs = payload;
+        const result = pageResult(payload);
+        s.adminJobs = result.content;
+        s.adminJobsPage = result.page;
         s.jobError = null;
       })
       .addCase(fetchAllJobsAdmin.rejected, (s, { payload }) => {
@@ -69,7 +77,9 @@ const jobSlice = createSlice({
       })
       .addCase(fetchMyJobs.fulfilled, (s, { payload }) => {
         s.isLoading = false;
-        s.myJobs = payload;
+        const result = pageResult(payload);
+        s.myJobs = result.content;
+        s.myJobsPage = result.page;
         s.jobError = null;
       })
       .addCase(fetchMyJobs.rejected, (s, { payload }) => {

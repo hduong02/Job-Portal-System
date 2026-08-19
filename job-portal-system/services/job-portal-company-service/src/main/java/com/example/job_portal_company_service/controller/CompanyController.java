@@ -2,8 +2,15 @@ package com.example.job_portal_company_service.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.domain.CompanyStatus;
@@ -13,8 +20,6 @@ import com.example.dto.request.CompanyRequest;
 import com.example.dto.response.ApiResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.job_portal_company_service.service.CompanyService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -33,6 +38,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
+    @Cacheable(value = "companies", key = "#id")
     public ResponseEntity<CompanyResponse> getCompanyById(
             @PathVariable Long id
     ) throws Exception {
@@ -47,15 +53,21 @@ public class CompanyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CompanyResponse>> getAllCompanies(
+    public ResponseEntity<Page<CompanyResponse>> getAllCompanies(
             @RequestParam(required = false) CompanyType companyType,
             @RequestParam(required = false) IndustryType industryType,
-            @RequestParam(required = false) CompanyStatus status) {
+            @RequestParam(required = false) CompanyStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
         return ResponseEntity.ok(
-                companyService.getAllCompanies(companyType, industryType, status));
+                companyService.getAllCompanies(companyType, industryType, status,
+                        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy))));
     }
 
     @PutMapping("/{id}")
+    @Caching(evict = @CacheEvict(value = "companies", key = "#id"))
     public ResponseEntity<CompanyResponse> updateCompany(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long ownerId,
@@ -65,18 +77,21 @@ public class CompanyController {
     }
 
     @PatchMapping("/{id}/verify")
+    @Caching(evict = @CacheEvict(value = "companies", key = "#id"))
     public ResponseEntity<CompanyResponse> verifyCompany(
             @PathVariable Long id) throws Exception {
         return ResponseEntity.ok(companyService.verifyCompany(id));
     }
 
     @PatchMapping("/{id}/deactivate")
+    @Caching(evict = @CacheEvict(value = "companies", key = "#id"))
     public ResponseEntity<CompanyResponse> deactivateCompany(
             @PathVariable Long id) throws Exception {
         return ResponseEntity.ok(companyService.deactivateCompany(id));
     }
 
     @DeleteMapping("/{id}")
+    @Caching(evict = @CacheEvict(value = "companies", key = "#id"))
     public ResponseEntity<ApiResponse> deleteCompany(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long ownerId)

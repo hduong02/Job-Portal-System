@@ -7,9 +7,11 @@ import {
 } from "./adminThunk";
 
 import { replaceInList } from "../utils/replaceInList";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   users: [],
+  usersPage: emptyPage,
   isLoading: false,
   isActionLoading: false,
   error: null,
@@ -25,7 +27,10 @@ const adminUserSlice = createSlice({
         ((state.isLoading = true), (state.error = null));
       })
       .addCase(fetchAllUsers.fulfilled, (state, { payload }) => {
-        ((state.isLoading = false), (state.users = payload));
+        const result = pageResult(payload);
+        state.isLoading = false;
+        state.users = result.content;
+        state.usersPage = result.page;
       })
       .addCase(fetchAllUsers.rejected, (state, { payload }) => {
         state.isLoading = false;

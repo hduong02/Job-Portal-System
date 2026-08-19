@@ -3,6 +3,9 @@ package com.example.job_portal_application_service.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.response.ApiResponse;
@@ -12,8 +15,6 @@ import com.example.job_portal_application_service.payload.CreateApplicationReque
 import com.example.job_portal_application_service.payload.UpdateApplicationStatusRequest;
 import com.example.job_portal_application_service.payload.WithdrawApplicationRequest;
 import com.example.job_portal_application_service.service.ApplicationService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -39,23 +40,37 @@ public class ApplicationController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<ApplicationResponse>> getMyApplications(
-            @RequestHeader("X-User-Id") Long candidateId) {
-        return ResponseEntity.ok(applicationService.getMyApplications(candidateId));
+    public ResponseEntity<Page<ApplicationResponse>> getMyApplications(
+            @RequestHeader("X-User-Id") Long candidateId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
+        return ResponseEntity.ok(applicationService.getMyApplications(candidateId,
+                pageable(page, size, applicationSort(sortBy), sortDirection)));
     }
 
     @GetMapping("/job/{jobId}")
-    public ResponseEntity<List<ApplicationResponse>> getApplicationsForJob(
-            @PathVariable Long jobId) {
-        return ResponseEntity.ok(applicationService.getApplicationsForJob(jobId));
+    public ResponseEntity<Page<ApplicationResponse>> getApplicationsForJob(
+            @PathVariable Long jobId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
+        return ResponseEntity.ok(applicationService.getApplicationsForJob(jobId,
+                pageable(page, size, applicationSort(sortBy), sortDirection)));
     }
 
     @GetMapping("/company")
-    public ResponseEntity<List<ApplicationResponse>> getApplicationsForCompany(
+    public ResponseEntity<Page<ApplicationResponse>> getApplicationsForCompany(
             @RequestHeader("X-User-Id") Long userId,
-            @ModelAttribute CompanyApplicationFilterRequest filter) throws Exception {
+            @ModelAttribute CompanyApplicationFilterRequest filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) throws Exception {
         return ResponseEntity.ok(applicationService.getApplicationsForCompany(
-                userId, filter));
+                userId, filter, pageable(page, size, applicationSort(sortBy), sortDirection)));
     }
 
     @PatchMapping("/{id}/status")
@@ -95,5 +110,13 @@ public class ApplicationController {
         applicationService.deleteApplication(id, candidateId);
         return ResponseEntity.ok(
                 new ApiResponse("Application deleted successfully", true));
+    }
+
+    private PageRequest pageable(int page, int size, String sortBy, String sortDirection) {
+        return PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+    }
+
+    private String applicationSort(String sortBy) {
+        return "createdAt".equals(sortBy) ? "appliedAt" : sortBy;
     }
 }

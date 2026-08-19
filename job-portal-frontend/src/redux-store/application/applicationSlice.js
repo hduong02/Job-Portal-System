@@ -10,10 +10,13 @@ import {
   updateApplicationStatus,
 } from "./applicationThunk";
 import { replaceInList } from "../utils/replaceInList";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   applications: [],
+  applicationsPage: emptyPage,
   myApplications: [],
+  myApplicationsPage: emptyPage,
   currentApplication: null,
   isLoading: false,
   isActionLoading: false,
@@ -30,7 +33,10 @@ const applicationSlice = createSlice({
         ((state.isLoading = true), (state.error = null));
       })
       .addCase(fetchCompanyApplications.fulfilled, (state, action) => {
-        ((state.isLoading = false), (state.applications = action.payload));
+        const result = pageResult(action.payload);
+        state.isLoading = false;
+        state.applications = result.content;
+        state.applicationsPage = result.page;
       })
       .addCase(fetchCompanyApplications.rejected, (state, action) => {
         ((state.isLoading = false), (state.error = action.payload));
@@ -44,7 +50,9 @@ const applicationSlice = createSlice({
       })
       .addCase(fetchJobApplications.fulfilled, (s, { payload }) => {
         s.isLoading = false;
-        s.applications = payload;
+        const result = pageResult(payload);
+        s.applications = result.content;
+        s.applicationsPage = result.page;
       })
       .addCase(fetchJobApplications.rejected, (s, { payload }) => {
         s.isLoading = false;
@@ -128,7 +136,9 @@ const applicationSlice = createSlice({
       })
       .addCase(fetchMyApplications.fulfilled, (s, { payload }) => {
         s.isLoading = false;
-        s.myApplications = payload;
+        const result = pageResult(payload);
+        s.myApplications = result.content;
+        s.myApplicationsPage = result.page;
       })
       .addCase(fetchMyApplications.rejected, (s, { payload }) => {
         s.isLoading = false;

@@ -14,6 +14,9 @@ export const fetchCompanyApplications = createAsyncThunk(
         params.aiShortlistStatus = filters.aiShortlistStatus;
       if (filters.minAiScore != null) params.minAiScore = filters.minAiScore;
       if (filters.sortBy) params.sortBy = filters.sortBy;
+      if (filters.sortDirection) params.sortDirection = filters.sortDirection;
+      if (filters.page != null) params.page = filters.page;
+      if (filters.size != null) params.size = filters.size;
 
       console.log("params -------- ",params,filters)
 
@@ -38,12 +41,12 @@ export const fetchCompanyApplications = createAsyncThunk(
 
 export const fetchJobApplications = createAsyncThunk(
   "application/fetchJobApplications",
-  async (jobId, { rejectWithValue }) => {
+  async ({ jobId, page = 0, size = 20 }, { rejectWithValue }) => {
     try {
       
 
 
-      const response = await api.get(`/api/applications/job/${jobId}`);
+      const response = await api.get(`/api/applications/job/${jobId}`, { params: { page, size } });
 
       console.log("Fetched job applications:", response.data);
 
@@ -105,9 +108,9 @@ export const toggleStar = createAsyncThunk(
 
 export const fetchMyApplications = createAsyncThunk(
   "application/fetchMy",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const { data } = await api.get("/api/applications/my")
+      const { data } = await api.get("/api/applications/my", { params })
       console.log("my applications --- ",data)
       return data
     } catch (err) {

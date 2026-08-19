@@ -24,9 +24,11 @@ import {
   updateWorkExperience,
 } from "./resumeThunk";
 import { replaceInList } from "../utils/replaceInList";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   resumes: [],
+  resumesPage: emptyPage,
   currentResume: null,
   loading: false,
   error: null,
@@ -101,7 +103,9 @@ const resumeSlice = createSlice({
       })
       .addCase(fetchMyResumes.fulfilled, (state, action) => {
         state.loading = false;
-        state.resumes = action.payload;
+        const result = pageResult(action.payload);
+        state.resumes = result.content;
+        state.resumesPage = result.page;
       })
       .addCase(fetchMyResumes.rejected, (state, action) => {
         state.loading = false;

@@ -3,6 +3,9 @@ package com.example.job_portal_resume_service.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.response.ApiResponse;
@@ -11,7 +14,6 @@ import com.example.dto.response.ResumeResponse;
 import com.example.job_portal_resume_service.payload.CreateResumeRequest;
 import com.example.job_portal_resume_service.service.ResumeService;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/resumes")
@@ -36,9 +38,14 @@ public class ResumeController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<ResumeResponse>> getMyResumes(
-            @RequestHeader("X-User-Id") Long candidateId) {
-        return ResponseEntity.ok(resumeService.getMyResumes(candidateId));
+    public ResponseEntity<Page<ResumeResponse>> getMyResumes(
+            @RequestHeader("X-User-Id") Long candidateId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
+        return ResponseEntity.ok(resumeService.getMyResumes(candidateId,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy))));
     }
 
     @PutMapping("/{resumeId}/personal-info")

@@ -25,6 +25,7 @@ import { fetchCompanyApplications } from "../../../redux-store/application/appli
 import { useSelector } from "react-redux";
 import { fetchMyJobs } from "../../../redux-store/job/jobThunk";
 import { fetchMyCompany } from "../../../redux-store/company/companyThunk";
+import PageControls from "../../../components/PageControls";
 
 // import {applications} from "./applications"
 // import { jobs } from "../../user/jobs/dummyjobs";
@@ -53,19 +54,20 @@ const EmployerApplications = () => {
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = React.useState("ALL");
   const [starredOnly, setStarredOnly] = React.useState(false);
-  const [unreadOnly, setUnreadOnly] = React.useState(false);
+  const [unreadOnly] = React.useState(false);
   const [aiFilter, setAiFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("DEFAULT");
+  const [page, setPage] = useState(0);
   const [statusDialog, setStatusDialog] = useState(null);
 
   const dispatch = useDispatch();
-  const { applications } = useSelector((state) => state.application);
+  const { applications, applicationsPage, isLoading, error } = useSelector((state) => state.application);
   const { myJobs: jobs } = useSelector((state) => state.job);
   const { myCompany } = useSelector((state) => state.company);
 
   const stats = useMemo(
     () => ({
-      total: applications.length,
+      total: applicationsPage.totalElements,
       pending: applications.filter((app) => app.status === "PENDING").length,
       shortlisted: applications.filter((app) => app.status === "SHORTLISTED")
         .length,
@@ -74,32 +76,36 @@ const EmployerApplications = () => {
         (app) => app.status === "AUTO_SHORTLISTED",
       ).length,
     }),
-    [applications],
+    [applications, applicationsPage.totalElements],
   );
 
   useEffect(() => {
     if (myCompany) {
       dispatch(fetchMyJobs(myCompany?.id));
     }
-  }, [myCompany]);
+  }, [dispatch, myCompany]);
 
   useEffect(() => {
     dispatch(fetchMyCompany());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const filters = {};
+    filters.page = page;
     if (jobFilter) filters.jobId = jobFilter;
     if (statusFilter != "ALL") filters.status = statusFilter;
     if (starredOnly) filters.isStarred = true;
     if (unreadOnly) filters.isRead = false;
     if (aiFilter !== "ALL") filters.aiShortlistStatus = aiFilter;
-    if (sortBy !== "DEFAULT") filters.sortBy = sortBy;
+    if (sortBy !== "DEFAULT") {
+      filters.sortBy = "aiScore";
+      filters.sortDirection = sortBy === "AI_SCORE_ASC" ? "ASC" : "DESC";
+    }
 
     console.log("filters ----- ", filters);
 
     dispatch(fetchCompanyApplications(filters));
-  }, [jobFilter, statusFilter, starredOnly, unreadOnly, aiFilter, setSortBy]);
+  }, [dispatch, jobFilter, statusFilter, starredOnly, unreadOnly, aiFilter, sortBy, page]);
 
   return (
     <main className="space-y-6">
@@ -119,25 +125,25 @@ const EmployerApplications = () => {
           color="bg-blue-50 text-primary"
         />
         <StateCard
-          label="Pending"
+          label="Pending on Page"
           value={stats.pending}
           icon={Users}
           color="bg-yellow-50 text-warning"
         />
         <StateCard
-          label="Shortlisted"
+          label="Shortlisted on Page"
           value={stats.shortlisted}
           icon={Users}
           color="bg-green-50 text-success"
         />
         <StateCard
-          label="Unread"
+          label="Unread on Page"
           value={stats.unread}
           icon={Users}
           color="bg-purple-50 text-info"
         />
         <StateCard
-          label="Auto-Shortlisted"
+          label="Auto-Shortlisted on Page"
           value={stats.autoShortlisted}
           icon={Users}
           color="bg-indigo-50 text-primary"
@@ -147,7 +153,7 @@ const EmployerApplications = () => {
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
         {/* Row 1: search + job select + AI shortlist + sort — all in one line */}
         <div className="flex flex-col md:flex-row gap-3">
-          <Select value={String(jobFilter)} onValueChange={setJobFilter}>
+          <Select value={String(jobFilter)} onValueChange={(value) => { setJobFilter(value); setPage(0); }}>
             <SelectTrigger className="border-slate-200 text-sm w-full sm:w-48">
               <Filter />
               <SelectValue placeholder="All Jobs" />
@@ -165,7 +171,7 @@ const EmployerApplications = () => {
           </Select>
 
           {/* ai shortlist */}
-          <Select onValueChange={setAiFilter}>
+          <Select onValueChange={(value) => { setAiFilter(value); setPage(0); }}>
             <SelectTrigger className="border-slate-200 text-sm w-full sm:w-48">
               <Sparkles className="h-3.5 w-3.5 mr-2 text-brand" />
               <SelectValue placeholder="AI Shortlist" />
@@ -180,7 +186,7 @@ const EmployerApplications = () => {
             </SelectContent>
           </Select>
 
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setPage(0); }}>
             <SelectTrigger className="border-slate-200 text-sm w-full sm:w-48">
               <Sparkles className="h-3.5 w-3.5 mr-2 text-brand" />
               <SelectValue placeholder="Sort by" />
@@ -202,7 +208,7 @@ const EmployerApplications = () => {
           <div className="flex gap-1.5 flex-wrap flex-1">
             {STATUS_FILTERS.map((status) => (
               <button
-                onClick={() => setStatusFilter(status)}
+                onClick={() => { setStatusFilter(status); setPage(0); }}
                 key={status}
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
                   statusFilter === status
@@ -216,7 +222,7 @@ const EmployerApplications = () => {
           </div>
           <div className="flex gap-2 shrink-0">
             <button
-              onClick={() => setStarredOnly(!starredOnly)}
+              onClick={() => { setStarredOnly(!starredOnly); setPage(0); }}
               className={cn(
                 "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors",
                 starredOnly
@@ -239,6 +245,9 @@ const EmployerApplications = () => {
           isFullMode={true}
         />
       </section>
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <PageControls page={applicationsPage} onPageChange={setPage} loading={isLoading} />
 
       {statusDialog && <UpdateStatusDialog
         open={statusDialog}

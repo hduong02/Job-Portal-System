@@ -59,10 +59,11 @@ export const fetchAllCompanies = createAsyncThunk(
       if (filters.companyType) params.companyType = filters.companyType
       if (filters.industryType) params.industryType = filters.industryType
       if (filters.status) params.status = filters.status
+      if (filters.page != null) params.page = filters.page
+      if (filters.size != null) params.size = filters.size
 
 
       const { data } = await api.get("/api/companies", { params })
-      console.log("Fetch All Companies", data)
       return data
     } catch (err) {
       return rejectWithValue(

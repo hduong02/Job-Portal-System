@@ -10,16 +10,19 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchMyResumes } from "../../../redux-store/resume/resumeThunk";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
+import PageControls from "../../../components/PageControls";
 
 // import { resumes } from "./dummyResume"
 
 const SelectResume = ({ selectedResume, setSelectedResume }) => {
-  const {resumes}=useSelector(store=>store.resume)
+  const {resumes, resumesPage, loading}=useSelector(store=>store.resume)
+  const [page, setPage] = useState(0);
   const dispatch=useDispatch()
   
   useEffect(() => {
-    dispatch(fetchMyResumes());
-  }, []);
+    dispatch(fetchMyResumes({ page }));
+  }, [dispatch, page]);
   return (
     <div className='space-y-6'>
       <div>
@@ -31,7 +34,7 @@ const SelectResume = ({ selectedResume, setSelectedResume }) => {
         </p>
       </div>
 
-      {resumes.length == 0 ? (
+      {resumesPage.totalElements == 0 && !loading ? (
         <div className="text-center py-12 text-slate-500">
           <FileText className="h-10 w-10 mx-auto mb-3 text-slate-300" />
           <p className="font-medium">No Resumes Found</p>
@@ -45,6 +48,7 @@ const SelectResume = ({ selectedResume, setSelectedResume }) => {
           <div className="space-y-3">
             {resumes.map((item) => (
               <Card
+                key={item.id}
                 onClick={() => setSelectedResume(item.id.toString())}
                 className={`cursor-pointer transition-colors ${
                   selectedResume === item.id.toString()
@@ -88,6 +92,7 @@ const SelectResume = ({ selectedResume, setSelectedResume }) => {
           </div>
         </RadioGroup>
       )}
+      <PageControls page={resumesPage} onPageChange={setPage} loading={loading} />
     </div>
   );
 };

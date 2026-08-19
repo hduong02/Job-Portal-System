@@ -3,6 +3,9 @@ package com.example.job_portal_user_service.controller;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.response.UserResponse;
@@ -10,8 +13,6 @@ import com.example.job_portal_user_service.mapper.UserMapper;
 import com.example.job_portal_user_service.model.User;
 import com.example.job_portal_user_service.payload.UpdateUserRequest;
 import com.example.job_portal_user_service.service.UserService;
-
-import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
@@ -42,8 +43,14 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() throws Exception {
-        return ResponseEntity.ok(UserMapper.toDTOList(userService.getAllUsers()));
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
+        return ResponseEntity.ok(userService.getAllUsers(
+                PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy)))
+                .map(UserMapper::toDTO));
     }
 
     @PatchMapping("/{userId}/suspend")

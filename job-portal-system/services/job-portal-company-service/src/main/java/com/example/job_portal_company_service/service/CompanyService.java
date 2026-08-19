@@ -1,6 +1,7 @@
 package com.example.job_portal_company_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.domain.CompanyStatus;
 import com.example.domain.CompanyType;
@@ -14,10 +15,11 @@ public interface CompanyService {
     CompanyResponse createCompany(Long ownerId, CompanyRequest req) throws Exception;
     CompanyResponse getCompanyById(Long id) throws Exception;
     CompanyResponse getMyCompany(Long ownerId) throws Exception;
-    List<CompanyResponse> getAllCompanies(
+    Page<CompanyResponse> getAllCompanies(
             CompanyType companyType,
             IndustryType industryType,
-            CompanyStatus companyStatus
+            CompanyStatus companyStatus,
+            Pageable pageable
     );
     CompanyResponse updateCompany(Long companyId, Long ownerId, CompanyRequest req)
             throws Exception;

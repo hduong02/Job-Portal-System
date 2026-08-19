@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avat
 import { Badge } from '../../../components/ui/badge'
 import { CheckCircle } from 'lucide-react'
 
-const CompanyTable = ({companies}) => {
+const CompanyTable = ({ companies = [], isLoading }) => {
   return (
     <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
       <Table>
@@ -34,6 +34,20 @@ const CompanyTable = ({companies}) => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {isLoading && (
+            <TableRow>
+              <TableCell colSpan={7} className="py-8 text-center text-sm text-slate-500">
+                Loading companies...
+              </TableCell>
+            </TableRow>
+          )}
+          {!isLoading && companies.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="py-8 text-center text-sm text-slate-500">
+                No companies found.
+              </TableCell>
+            </TableRow>
+          )}
           {companies.map((company, index) => {
             
            const joinedAt=company.createdAt?new Date(company.createdAt).toLocaleDateString("en-US",{
@@ -42,13 +56,13 @@ const CompanyTable = ({companies}) => {
               year:"numeric"
             }):"-"
             return (
-              <TableRow>
+              <TableRow key={company.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar>
                       <AvatarImage src={company.logoUrl} />
-                      <AvatarFallback>{company.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{company.name?.charAt(0) || "C"}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="text-sm font-semibold text-slate-900 leading-tight">{company.name}</p>
@@ -74,9 +88,9 @@ const CompanyTable = ({companies}) => {
                 </TableCell>
                 <TableCell>
                   
-                  <Badge className={`${company.verified?"bg-green-100 text-green-700":""}`}>
-                    {company.verified && <CheckCircle className="h-3 w-3" />}
-                    {company.verified? "Verified":"Unverified"}
+                  <Badge className={`${company.verifiedAt ? "bg-green-100 text-green-700" : ""}`}>
+                    {company.verifiedAt && <CheckCircle className="h-3 w-3" />}
+                    {company.verifiedAt ? "Verified" : "Unverified"}
                   </Badge>
                 </TableCell>
                 

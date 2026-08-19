@@ -27,9 +27,10 @@ export const fetchJobs = createAsyncThunk(
 
 export const fetchMyJobs = createAsyncThunk(
   "job/fetchMyJobs",
-  async (companyId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
-      const { data } = await api.get(`/api/jobs//company/${companyId}`);
+      const { companyId, page = 0, size = 20 } = typeof arg === "object" ? arg : { companyId: arg };
+      const { data } = await api.get(`/api/jobs/company/${companyId}`, { params: { page, size } });
       console.log("fetch my jobs -------- ", data);
       return data;
     } catch (err) {
@@ -122,9 +123,9 @@ export const closeJob = createAsyncThunk(
 
 export const fetchAllJobsAdmin = createAsyncThunk(
   "job/fetchAllJobsAdmin",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const { data } = await api.get("/api/jobs/admin");
+      const { data } = await api.get("/api/jobs/admin", { params });
       console.log("jobs", data);
       return data;
     } catch (err) {

@@ -3,6 +3,8 @@ package com.example.job_portal_application_service.service.impl;
 import com.example.job_portal_application_service.event.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.ApplicationStatus;
@@ -89,28 +91,22 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ApplicationResponse> getMyApplications(Long candidateId) {
-        return applicationRepository.findByCandidateId(candidateId)
-                .stream()
-                .map(this::buildFullResponse)
-                .toList();
+    public Page<ApplicationResponse> getMyApplications(Long candidateId, Pageable pageable) {
+        return applicationRepository.findByCandidateId(candidateId, pageable)
+                .map(this::buildFullResponse);
     }
 
     @Override
-    public List<ApplicationResponse> getApplicationsForJob(Long jobId) {
-        return applicationRepository.findByJobId(jobId)
-                .stream()
-                .map(this::buildFullResponse)
-                .toList();
+    public Page<ApplicationResponse> getApplicationsForJob(Long jobId, Pageable pageable) {
+        return applicationRepository.findByJobId(jobId, pageable)
+                .map(this::buildFullResponse);
     }
 
     @Override
-    public List<ApplicationResponse> getApplicationsForCompany(Long userId,
-            CompanyApplicationFilterRequest filter) {
+    public Page<ApplicationResponse> getApplicationsForCompany(Long userId,
+            CompanyApplicationFilterRequest filter, Pageable pageable) {
 
         Long companyId = companyClient.getMyCompany(userId).getId();
-        Sort sort = buildSort(filter.getSortBy());
-
         return applicationRepository.findAll(
                 ApplicationSpecification.forCompanyWithFilters(
                     companyId,
@@ -119,10 +115,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                     filter.getIsStarred(),
                     filter.getAiShortListStatus(),
                     filter.getMinAiScore()
-                ), sort)
-                .stream()
-                .map(this::buildFullResponse)
-                .toList();
+                ), pageable)
+                .map(this::buildFullResponse);
     }
 
     @Override

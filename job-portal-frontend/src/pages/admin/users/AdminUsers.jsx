@@ -12,15 +12,17 @@ import UserTable from "./UserTable";
 import { fetchAllUsers } from "../../../redux-store/adminUser/adminThunk";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
+import PageControls from "../../../components/PageControls";
 
 // import { users } from "./userData";
 
 const AdminUsers = () => {
   const [roleFilter,setRoleFilter]=useState("all")
   const [statusFilter,setStatusFilter]=useState("all")
+  const [page, setPage] = useState(0);
 
   const dispatch = useDispatch();
-  const {users} = useSelector(state=>state.adminUser)
+  const {users, usersPage, isLoading, error} = useSelector(state=>state.adminUser)
 
   const filtered=useMemo(()=>{
 
@@ -34,16 +36,16 @@ const AdminUsers = () => {
   },[users,roleFilter,statusFilter])
 
   const stats = useMemo(() => {
-    const total = users.length;
+    const total = usersPage.totalElements;
     const seekers = users.filter((u) => u.role === "ROLE_JOB_SEEKER").length;
     const employers = users.filter((u) => u.role === "ROLE_EMPLOYER").length;
     const suspended = users.filter((u) => u.status === "SUSPENDED").length;
     return { total, seekers, employers, suspended };
-  }, [users]);
+  }, [users, usersPage.totalElements]);
 
   useEffect(() => {
-    dispatch(fetchAllUsers);
-  }, []);
+    dispatch(fetchAllUsers({ page }));
+  }, [dispatch, page]);
 
   const summaryCards = [
     {
@@ -53,19 +55,19 @@ const AdminUsers = () => {
       color: "text-primary bg-blue-50",
     },
     {
-      label: "Job Seekers",
+      label: "Job Seekers on Page",
       value: stats.seekers,
       icon: UserCheck,
       color: "text-emerald-600 bg-emerald-50",
     },
     {
-      label: "Employers",
+      label: "Employers on Page",
       value: stats.employers,
       icon: Briefcase,
       color: "text-purple-600 bg-purple-50",
     },
     {
-      label: "Suspended",
+      label: "Suspended on Page",
       value: stats.suspended,
       icon: UserX,
       color: "text-red-600 bg-red-50",
@@ -96,6 +98,8 @@ const AdminUsers = () => {
         onStatusFilter={setStatusFilter}
       />
       <UserTable users={filtered} />
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <PageControls page={usersPage} onPageChange={setPage} loading={isLoading} />
     </div>
   );
 };

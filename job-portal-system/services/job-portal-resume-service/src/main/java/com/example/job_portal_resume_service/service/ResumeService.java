@@ -1,6 +1,7 @@
 package com.example.job_portal_resume_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.dto.response.PersonalInfoResponse;
 import com.example.dto.response.ResumeResponse;
@@ -13,7 +14,7 @@ public interface ResumeService {
 
     ResumeResponse getResumeById(Long resumeId, Long candidateId) throws Exception;
 
-    List<ResumeResponse> getMyResumes(Long candidateId);
+    Page<ResumeResponse> getMyResumes(Long candidateId, Pageable pageable);
 
     ResumeResponse updatePersonalInfo(
             Long resumeId,

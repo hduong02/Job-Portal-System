@@ -3,9 +3,9 @@ import api from "../api";
 
 export const fetchMySavedJobs = createAsyncThunk(
   "savedJob/fetchMySavedJobs",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/preferences/saved-jobs");
+      const response = await api.get("/api/preferences/saved-jobs", { params });
       console.log("Fetched saved jobs:", response.data);
       return response.data;
     } catch (error) {

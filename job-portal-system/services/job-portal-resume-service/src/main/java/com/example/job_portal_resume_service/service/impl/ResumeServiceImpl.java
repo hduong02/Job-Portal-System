@@ -3,6 +3,8 @@ package com.example.job_portal_resume_service.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.dto.response.EducationResponse;
 import com.example.dto.response.LanguageResponse;
@@ -70,9 +72,9 @@ public class ResumeServiceImpl implements ResumeService {
 
 
     @Override
-    public List<ResumeResponse> getMyResumes(Long candidateId) {
-        return resumeRepository.findByCandidateIdAndIsActiveTrue(candidateId)
-                .stream().map(this::buildFullResponse).toList();
+    public Page<ResumeResponse> getMyResumes(Long candidateId, Pageable pageable) {
+        return resumeRepository.findByCandidateIdAndIsActiveTrue(candidateId, pageable)
+                .map(this::buildFullResponse);
     }
 
     @Override

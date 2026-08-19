@@ -23,7 +23,7 @@ import { useEffect } from "react";
 import { fetchJobs } from "../../../redux-store/job/jobThunk";
 import { useSelector } from "react-redux";
 import { enhanceSearch } from "../../../redux-store/ai/aiThunk";
-import { useMemo } from "react";
+import PageControls from "../../../components/PageControls";
 // import { jobs } from './dummyjobs';
 
 const SORT_OPTIONS = [
@@ -45,14 +45,20 @@ const DEFAULT_FILTERS = {
 const Jobs = () => {
   const [aiQuery, setAiQuery] = React.useState("");
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const dispatch = useDispatch();
-  const { jobs } = useSelector((state) => state.job);
-  const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const { jobs, jobsPage, jobLoading, jobError } = useSelector((state) => state.job);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const activeFilterCount = [
+    filters.keyword, filters.location,
+    ...filters.jobTypes, ...filters.workModes, ...filters.expLevels,
+    filters.minSalary > 0 ? filters.minSalary : null,
+    filters.maxSalary < 500000 ? filters.maxSalary : null,
+  ].filter(Boolean).length;
 
   const handleSortBy = (value) => {
-    (setSortBy(value), setPage(1));
+    setSortBy(value);
+    setPage(0);
   };
 
   useEffect(() => {
@@ -65,20 +71,17 @@ const Jobs = () => {
         filters.expLevels.length > 0 ? filters.expLevels[0] : undefined,
       minSalary: filters.minSalary > 0 ? filters.minSalary : undefined,
       maxSalary: filters.maxSalary < 500000 ? filters.maxSalary : undefined,
+      page,
+      sortBy: sortBy === "newest" ? "createdAt" : sortBy === "salary-high" ? "salaryRange.maxSalary" : "salaryRange.minSalary",
+      sortDirection: sortBy === "salary-low" ? "ASC" : "DESC",
     };
 
-    const active = Object.values(param).filter(
-      (value) => value !== undefined,
-    ).length;
-
-    setActiveFilterCount(active);
-
     dispatch(fetchJobs(param));
-  }, [filters]);
+  }, [filters, page, sortBy, dispatch]);
 
   const handleFilter = (val) => {
     setFilters(val);
-    setPage(1);
+    setPage(0);
   };
 
   const handleEnhance = async () => {
@@ -118,22 +121,8 @@ const Jobs = () => {
     console.log("new filters", newFilters);
 
     setFilters(newFilters);
+    setPage(0);
   };
-
-  const sortedJobs = useMemo(() => {
-    const sorted = [...jobs];
-    if (sortBy == "salary-high")
-      return sorted.sort(
-        (a, b) => Number(b.maxSalary ?? 0) - Number(a.maxSalary ?? 0),
-      );
-    if (sortBy == "salary-low")
-      return sorted.sort(
-        (a, b) => Number(a.minSalary ?? 0) - Number(b.minSalary ?? 0),
-      );
-    return sorted.sort(
-      (a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0),
-    );
-  }, [sortBy, jobs]);
 
   return (
 
@@ -192,7 +181,7 @@ const Jobs = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-800">
-                    {jobs.length} Jobs Found
+                    {jobsPage.totalElements} Jobs Found
                   </p>
                   <p className="text-xs text-slate-500">java developer</p>
                 </div>
@@ -231,16 +220,19 @@ const Jobs = () => {
                 setFilters={handleFilter}
                 onReset={() => {
                   setFilters(DEFAULT_FILTERS);
-                  setPage(1);
+                  setPage(0);
                 }}
               />
             </div>
 
             {/* Job list */}
             <div className="lg:col-span-3 space-y-5 ">
+              {jobError && <p className="text-sm text-red-600">{jobError}</p>}
+              {!jobLoading && !jobError && jobs.length === 0 && <p className="text-sm text-slate-500">No jobs found.</p>}
               {jobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
+              <PageControls page={jobsPage} onPageChange={setPage} loading={jobLoading} />
             </div>
           </div>
         </section>

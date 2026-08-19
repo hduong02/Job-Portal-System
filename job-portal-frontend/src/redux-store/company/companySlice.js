@@ -9,10 +9,12 @@ import {
   updateCompany,
   verifyCompany,
 } from "./companyThunk";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   myCompany: null,
   companies: [],
+  companiesPage: emptyPage,
   currentCompany: null,
   isLoading: false,
   error: null,
@@ -74,7 +76,9 @@ const companySlice = createSlice({
       })
       .addCase(fetchAllCompanies.fulfilled, (state, { payload }) => {
         state.isLoading = false;
-        state.companies = payload;
+        const result = pageResult(payload);
+        state.companies = result.content;
+        state.companiesPage = result.page;
       })
       .addCase(fetchAllCompanies.rejected, (state, { payload }) => {
         state.isLoading = false;

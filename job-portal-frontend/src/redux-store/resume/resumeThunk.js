@@ -3,9 +3,9 @@ import api from "../api";
 
 export const fetchMyResumes = createAsyncThunk(
   "resume/fetchMyResumes",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/resumes/my");
+      const response = await api.get("/api/resumes/my", { params });
       console.log("Fetched resumes:", response.data);
       return response.data;
     } catch (error) {

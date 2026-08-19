@@ -16,26 +16,28 @@ import ApplicationCard from "./ApplicationCard";
 
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { fetchMyApplications, withdrawApplication } from "../../../redux-store/application/applicationThunk";
+import { fetchMyApplications } from "../../../redux-store/application/applicationThunk";
 import { useSelector } from "react-redux";
+import PageControls from "../../../components/PageControls";
 
 // import { myApplications } from "./dummyApplication";
 
 const Application = () => {
   const [selectedTab, setSelectedTab] = useState("all");
+  const [page, setPage] = useState(0);
   const dispatch = useDispatch();
-  const {myApplications}=useSelector(store=>store.application)
+  const {myApplications, myApplicationsPage, isLoading, error}=useSelector(store=>store.application)
 
   const stats = {
-    total: 5,
-    active: 4,
-    shortlisted: 3,
-    hired: 1,
+    total: myApplicationsPage.totalElements,
+    active: myApplications.filter((app) => !["REJECTED", "WITHDRAWN", "HIRED"].includes(app.status)).length,
+    shortlisted: myApplications.filter((app) => app.status === "SHORTLISTED").length,
+    hired: myApplications.filter((app) => app.status === "HIRED").length,
   };
 
   useEffect(() => {
-    dispatch(fetchMyApplications());
-  }, []);
+    dispatch(fetchMyApplications({ page }));
+  }, [dispatch, page]);
 
   return (
     <div className="max-w-5xl min-w-5xl max-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -60,21 +62,21 @@ const Application = () => {
         />
 
         <ApplicationStateCard
-          label={"Active"}
+          label={"Active on Page"}
           value={stats.active}
           icon={TrendingUp}
           color={"text-indigo-600 bg-indigo-50"}
         />
 
         <ApplicationStateCard
-          label={"Shortlisted"}
+          label={"Shortlisted on Page"}
           value={stats.shortlisted}
           icon={CheckCircle2}
           color={"text-purple-600 bg-purple-50"}
         />
 
         <ApplicationStateCard
-          label="Hired"
+          label="Hired on Page"
           value={stats.hired}
           icon={Users}
           color="text-green-600 bg-green-50"
@@ -101,6 +103,8 @@ const Application = () => {
           ))}
         </TabsContent>
       </Tabs>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <PageControls page={myApplicationsPage} onPageChange={setPage} loading={isLoading} />
     </div>
   );
 };

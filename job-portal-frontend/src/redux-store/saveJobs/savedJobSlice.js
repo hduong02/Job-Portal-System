@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchMySavedJobs, saveJob, unsaveJob } from "./saveJobThunk";
+import { emptyPage, pageResult } from "../utils/pageResult";
 
 const initialState = {
   savedJobs: [],
+  savedJobsPage: emptyPage,
   savedJobMap: {},
   isLoading: false,
   error: null,
@@ -17,7 +19,10 @@ const savedJobSlice = createSlice({
         ((state.isLoading = true), (state.error = null));
       })
       .addCase(fetchMySavedJobs.fulfilled, (state, action) => {
-        ((state.isLoading = false), (state.savedJobs = action.payload));
+        const result = pageResult(action.payload);
+        state.isLoading = false;
+        state.savedJobs = result.content;
+        state.savedJobsPage = result.page;
       })
       .addCase(fetchMySavedJobs.rejected, (s, { payload }) => {
         s.isLoading = false;

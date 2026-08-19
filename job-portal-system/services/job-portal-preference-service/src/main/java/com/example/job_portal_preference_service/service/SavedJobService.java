@@ -1,6 +1,7 @@
 package com.example.job_portal_preference_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.dto.response.SavedJobResponse;
 import com.example.job_portal_preference_service.payload.SaveJobRequest;
@@ -11,7 +12,7 @@ public interface SavedJobService {
 
     void unsaveJob(Long candidateId, Long savedJobId) throws Exception;
 
-    List<SavedJobResponse> getSavedJob(Long candidateId);
+    Page<SavedJobResponse> getSavedJob(Long candidateId, Pageable pageable);
 
     boolean isSaved(Long candidateId, Long jobId);
 }

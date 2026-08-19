@@ -1,6 +1,7 @@
 package com.example.job_portal_job_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.dto.request.JobRequest;
 import com.example.dto.response.JobResponse;
@@ -12,9 +13,9 @@ public interface JobService {
 
     JobResponse getJobById(Long id) throws Exception;
 
-    List<JobResponse> getJobs(JobSearchRequest request);
+    Page<JobResponse> getJobs(JobSearchRequest request, Pageable pageable);
 
-    List<JobResponse> getJobsByCompany(Long companyId);
+    Page<JobResponse> getJobsByCompany(Long companyId, Pageable pageable);
 
     JobResponse updateJob(Long jobId, Long employerId, JobRequest req) throws Exception;
 
@@ -24,5 +25,5 @@ public interface JobService {
 
     void deleteJob(Long jobId, Long employerId) throws Exception;
 
-    List<JobResponse> getAllJobsAdmin();
+    Page<JobResponse> getAllJobsAdmin(Pageable pageable);
 }
