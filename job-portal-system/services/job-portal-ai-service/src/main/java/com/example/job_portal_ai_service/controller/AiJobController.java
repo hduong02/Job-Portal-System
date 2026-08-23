@@ -46,9 +46,9 @@ public class AiJobController {
     @GetMapping("/skills-recommendation")
     public ResponseEntity<AiTextResponse> recommendSkills(
             @RequestParam String title,
-            @RequestParam(required = false) String category)
+            @RequestParam(required = false) String description)
             throws Exception {
-        AiTextResponse response = jobAiService.recommendSkillForJob(title, category);
+        AiTextResponse response = jobAiService.recommendSkillForJob(title, description);
         return ResponseEntity.ok(response);
     }
 

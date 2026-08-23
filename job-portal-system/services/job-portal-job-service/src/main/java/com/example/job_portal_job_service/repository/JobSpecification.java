@@ -40,6 +40,16 @@ public class JobSpecification {
                 predicates.add(cb.equal(root.get("category").get("id"), req.getCategoryId()));
             }
 
+            if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
+                for (String term : req.getKeyword().trim().split("\\s+")) {
+                    String pattern = "%" + term.toLowerCase() + "%";
+                    predicates.add(cb.or(
+                            cb.like(cb.lower(root.get("title")), pattern),
+                            cb.like(cb.lower(root.get("description")), pattern)
+                    ));
+                }
+            }
+
             if (req.getLocation() != null && !req.getLocation().isBlank()) {
                 String pattern = "%" + req.getLocation().toLowerCase() + "%";
                 Path<String> city = root.get("location").get("city");

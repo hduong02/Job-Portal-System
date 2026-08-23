@@ -73,7 +73,7 @@ const EmployerApplications = () => {
         .length,
       unread: applications.filter((app) => !app.isRead).length,
       autoShortlisted: applications.filter(
-        (app) => app.status === "AUTO_SHORTLISTED",
+        (app) => app.aiShortlistStatus === "AUTO_SHORTLISTED",
       ).length,
     }),
     [applications, applicationsPage.totalElements],

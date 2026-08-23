@@ -100,7 +100,7 @@ const Jobs = () => {
       enh.workModes?.length ||
       enh.experienceLevels?.length ||
       enh.minSalary ||
-      enh.locations.length;
+      enh.locations?.length;
 
     if (!hasResults) {
       console.log("no results found");
@@ -110,7 +110,8 @@ const Jobs = () => {
     const newFilters = {
       ...DEFAULT_FILTERS,
     };
-    if (enh.keyword?.length) newFilters.keyword = enh.keyword;
+    if (enh.keywords?.length)
+      newFilters.keyword = enh.keywords.filter(Boolean).join(" ");
     if (enh.jobTypes?.length) newFilters.jobTypes = enh.jobTypes;
     if (enh.workModes?.length) newFilters.workModes = enh.workModes;
     if (enh.experienceLevels?.length)
