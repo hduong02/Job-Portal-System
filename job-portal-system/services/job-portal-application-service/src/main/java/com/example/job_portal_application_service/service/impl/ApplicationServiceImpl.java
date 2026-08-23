@@ -6,8 +6,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.domain.ApplicationStatus;
+import com.example.domain.JobStatus;
 import com.example.dto.response.ApplicationResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
@@ -32,6 +35,7 @@ import com.example.job_portal_application_service.service.ApplicationScreeningSe
 import com.example.job_portal_application_service.service.ApplicationService;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +61,14 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         JobResponse job = jobClient.getJobById(req.getJobId());
+        LocalDate today = LocalDate.now();
+        if (job.getStatus() != JobStatus.OPEN
+                || !Boolean.TRUE.equals(job.getActive())
+                || (job.getApplicationDeadline() != null && job.getApplicationDeadline().isBefore(today))
+                || (job.getExpiresAt() != null && job.getExpiresAt().isBefore(today))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "This job is not accepting applications");
+        }
         Long companyId = job.getCompany().getId();
         Long employerId = job.getEmployerId();
 
@@ -85,8 +97,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationResponse getApplicationById(Long id) throws Exception {
+    public ApplicationResponse getApplicationById(Long id, Long requesterId) throws Exception {
         Application application = getApplicationEntity(id);
+        if (!application.getCandidateId().equals(requesterId)
+                && !application.getEmployerId().equals(requesterId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot view this application");
+        }
         return buildFullResponse(application);
     }
 
@@ -97,7 +114,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<ApplicationResponse> getApplicationsForJob(Long jobId, Pageable pageable) {
+    public Page<ApplicationResponse> getApplicationsForJob(Long jobId, Long employerId, Pageable pageable) {
+        JobResponse job = jobClient.getJobById(jobId);
+        if (!job.getEmployerId().equals(employerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot view applications for this job");
+        }
         return applicationRepository.findByJobId(jobId, pageable)
                 .map(this::buildFullResponse);
     }

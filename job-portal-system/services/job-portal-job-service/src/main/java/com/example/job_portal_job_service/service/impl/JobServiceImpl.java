@@ -186,7 +186,7 @@ public class JobServiceImpl implements JobService {
 
     private JobResponse convertToResponse(Job savedJob) {
         CompanyResponse companyResponse = companyClient.getCompanyById(
-                savedJob.getEmployerId());
+                savedJob.getCompanyId());
         
         return JobMapper.toResponse(savedJob, companyResponse);
     }

@@ -35,8 +35,9 @@ public class ApplicationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponse> getApplicationById(
-            @PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(applicationService.getApplicationById(id));
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long requesterId) throws Exception {
+        return ResponseEntity.ok(applicationService.getApplicationById(id, requesterId));
     }
 
     @GetMapping("/my")
@@ -53,11 +54,12 @@ public class ApplicationController {
     @GetMapping("/job/{jobId}")
     public ResponseEntity<Page<ApplicationResponse>> getApplicationsForJob(
             @PathVariable Long jobId,
+            @RequestHeader("X-User-Id") Long employerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDirection) {
-        return ResponseEntity.ok(applicationService.getApplicationsForJob(jobId,
+        return ResponseEntity.ok(applicationService.getApplicationsForJob(jobId, employerId,
                 pageable(page, size, applicationSort(sortBy), sortDirection)));
     }
 

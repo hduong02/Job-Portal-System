@@ -7,6 +7,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.domain.UserRole;
 import com.example.domain.UserStatus;
@@ -77,9 +79,13 @@ public class AuthServiceImpl implements AuthService {
                 req.getEmail(), req.getPassword()
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
         User user = userRepository.findByEmail(req.getEmail());
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "This account is not active");
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateToken(authentication,user.getId());
 

@@ -132,9 +132,23 @@ services:
 
 
   # ============================================================
-  # SPRING CLOUD
+  # CACHE
   # ============================================================
 
+  redis:
+    image: redis:7-alpine
+    container_name: job-portal-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-net
+
+  # ============================================================
+  # SPRING CLOUD
+  # ============================================================
 
   discovery:
     image: andyy02/job-portal-service-registry:latest
@@ -224,6 +238,15 @@ services:
   # APPLICATION SERVICES
   # ============================================================
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: job-portal-mailhog
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    networks:
+      - job-portal-net
+
   user-service:
     image: andyy02/job-portal-user-service:latest
     container_name: job-portal-user-service
@@ -264,11 +287,14 @@ services:
         condition: service_healthy
       config-server:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://companydb:5432/job_portal_company
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
@@ -288,11 +314,14 @@ services:
         condition: service_healthy
       config-server:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://jobdb:5432/job_portal_job
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
@@ -403,9 +432,18 @@ services:
         condition: service_healthy
       config-server:
         condition: service_healthy
+      mailhog:
+        condition: service_started
     environment:
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      SPRING_MAIL_USERNAME: no-reply@job-portal.local
+      SPRING_MAIL_PASSWORD: ""
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+      APP_MAIL_FROM: no-reply@job-portal.local
     networks:
       - job-portal-net

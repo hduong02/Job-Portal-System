@@ -19,7 +19,7 @@ public class EmailNotificationService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${app.mail.from}")
     private String fromEmail;
 
     public void sendStatusChangedEmail(ApplicationStatusChangedEvent event) throws Exception {

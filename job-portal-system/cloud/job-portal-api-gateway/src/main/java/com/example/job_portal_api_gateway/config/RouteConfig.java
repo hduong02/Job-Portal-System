@@ -3,6 +3,7 @@ package com.example.job_portal_api_gateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.function.*;
 
@@ -12,6 +13,7 @@ import com.example.job_portal_api_gateway.jwt.JwtUtil;
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
 import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions;
+import java.util.Arrays;
 
 @Configuration
 public class RouteConfig {
@@ -44,11 +46,16 @@ public class RouteConfig {
 
     private ServerRequest requireRole(ServerRequest request, String roleAdmin) {
         String roles = request.headers().firstHeader("X-User-Role");
-        if (roles == null || !roles.contains(roleAdmin)) {
+        if (!hasRole(roles, roleAdmin)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Access denied for role " + roleAdmin);
         }
         return request;
+    }
+
+    private boolean hasRole(String roles, String requiredRole) {
+        return roles != null && Arrays.stream(roles.split(","))
+                .anyMatch(requiredRole::equals);
     }
 
     // ==================== Protected Routes (JWT required) ====================
@@ -122,7 +129,7 @@ public class RouteConfig {
 
 
 //    jwt filter
-    private ServerRequest jwtAuthFilter(ServerRequest request){
+    ServerRequest jwtAuthFilter(ServerRequest request){
         String authHeader = request.headers().firstHeader(JwtConstant.JWT_HEADER);
 
         if (authHeader == null || !authHeader.startsWith(JwtConstant.TOKEN_PREFIX)) {
@@ -142,10 +149,19 @@ public class RouteConfig {
         String authorities = jwtUtil.extractAuthorities(token);
         Long userId = jwtUtil.extractUserId(token);
 
+        if (request.method() == HttpMethod.PATCH
+                && request.path().matches("/api/companies/[^/]+/(verify|deactivate)")
+                && !hasRole(authorities, "ROLE_ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Company verification and deactivation require an admin");
+        }
+
         return ServerRequest.from(request)
-                .header("X-User-Id", String.valueOf(userId))
-                .header("X-User-Email", email)
-                .header("X-User-Role", authorities)
+                .headers(headers -> {
+                    headers.set("X-User-Id", String.valueOf(userId));
+                    headers.set("X-User-Email", email);
+                    headers.set("X-User-Role", authorities);
+                })
                 .build();
     }
 }

@@ -9,13 +9,15 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:hoangduongvd99@gmail.com}
-    password: ${MAIL_PASSWORD:licd ygvc curk timg}
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
+            enable: false
+
+app:
+  mail:
+    from: ${MAIL_FROM:no-reply@job-portal.local}

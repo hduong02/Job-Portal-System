@@ -17,11 +17,11 @@ public interface ApplicationService {
             Long candidateId,
             CreateApplicationRequest req) throws Exception;
 
-    ApplicationResponse getApplicationById(Long id) throws Exception;
+    ApplicationResponse getApplicationById(Long id, Long requesterId) throws Exception;
 
     Page<ApplicationResponse> getMyApplications(Long candidateId, Pageable pageable);
 
-    Page<ApplicationResponse> getApplicationsForJob(Long jobId, Pageable pageable);
+    Page<ApplicationResponse> getApplicationsForJob(Long jobId, Long employerId, Pageable pageable);
 
     Page<ApplicationResponse> getApplicationsForCompany(Long userId,
             CompanyApplicationFilterRequest filter, Pageable pageable);

@@ -2,6 +2,8 @@ package com.example.job_portal_company_service.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -136,6 +138,7 @@ public class CompanyServiceImpl implements CompanyService {
             CompanyRequest req
     ) throws Exception {
         Company company = getCompanyEntityById(companyId);
+        assertOwner(company, ownerId);
 
         if (!company.getName().equals(req.getName())
                 && companyRepository.existsByName(req.getName())) {
@@ -181,9 +184,10 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.delete(company);
     }
 
-    private void assertOwner(Company company, Long ownerId) throws Exception {
+    private void assertOwner(Company company, Long ownerId) {
         if (!company.getOwnerId().equals(ownerId)) {
-            throw new Exception("you are not the owner of this company");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You are not the owner of this company");
         }
     }
 
