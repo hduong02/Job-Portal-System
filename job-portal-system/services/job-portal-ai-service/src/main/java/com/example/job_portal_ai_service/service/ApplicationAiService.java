@@ -90,12 +90,16 @@ public class ApplicationAiService {
                 ? String.join(", ", req.getRequiredSkills())
                 : "Not Provided";
 
-        String candidateSkills = req.getRequiredSkills() != null
-                ? String.join(", ", req.getRequiredSkills())
+        String candidateSkills = req.getCandidateSkills() != null
+                ? String.join(", ", req.getCandidateSkills())
                 : "Not Provided";
 
         String candidateExperience = req.getCandidateExperience() != null
                 ? String.join(", ", req.getCandidateExperience())
+                : "Not Provided";
+
+        String candidateEducation = req.getCandidateEducation() != null && !req.getCandidateEducation().isEmpty()
+                ? String.join(", ", req.getCandidateEducation())
                 : "Not Provided";
 
         String prompt = """
@@ -112,6 +116,7 @@ public class ApplicationAiService {
                 - Professional Summary: %s
                 - Skills: %s
                 - Experience History: %s
+                - Education: %s
 
                 {
                     "score": 85,
@@ -145,7 +150,8 @@ public class ApplicationAiService {
                                 ? req.getCandidateSummary()
                                 : "not provided",
                         candidateSkills,
-                        candidateExperience
+                        candidateExperience,
+                        candidateEducation
         );
 
         return geminiClient.generateJson(systemPrompt, prompt, ScreeningScoreResponse.class);

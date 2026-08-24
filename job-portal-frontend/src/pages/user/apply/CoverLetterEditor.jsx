@@ -24,21 +24,57 @@ const tips = [
 const CoverLetterEditor = ({ coverLetter, setCoverLetter, selectedResume }) => {
   const { currentJob: job } = useSelector((store) => store.job);
   const { user } = useSelector((store) => store.auth);
-  const { currentResume } = useSelector((store) => store.resume);
   const dispatch = useDispatch();
+  const [resume, setResume] = React.useState(null);
+  const [resumeError, setResumeError] = React.useState(null);
+  const [loadAttempt, setLoadAttempt] = React.useState(0);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [generationError, setGenerationError] = React.useState(null);
+  const generationRequest = React.useRef(null);
+  const resumeReady = selectedResume != null && resume?.id != null
+    && String(resume.id) === String(selectedResume);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(coverLetter);
   };
 
   useEffect(() => {
+    let active = true;
+    setResume(null);
+    setResumeError(null);
+    setGenerationError(null);
+    setIsGenerating(false);
+    generationRequest.current = null;
+
     if (selectedResume) {
-      dispatch(fetchResumeById(selectedResume));
+      dispatch(fetchResumeById(selectedResume)).unwrap()
+        .then((loadedResume) => {
+          if (!active) return;
+          if (loadedResume?.id == null || String(loadedResume.id) !== String(selectedResume)) {
+            setResumeError("Could not load the selected resume. Please try again.");
+            return;
+          }
+          setResume(loadedResume);
+        })
+        .catch((error) => {
+          if (active) {
+            setResumeError(typeof error === "string" ? error : error?.message || "Failed to load resume.");
+          }
+        });
     }
-  }, [selectedResume]);
+
+    return () => {
+      active = false;
+      generationRequest.current = null;
+    };
+  }, [dispatch, selectedResume, loadAttempt]);
 
   const handleGenerateCoverLatterWithAi = async () => {
-    const resume = currentResume;
+    if (!resumeReady || generationRequest.current) return;
+    const request = {};
+    generationRequest.current = request;
+    setIsGenerating(true);
+    setGenerationError(null);
 
     const candidateSkills =
       resume?.skills?.map((s) => s.skillName).filter(Boolean) ?? [];
@@ -64,10 +100,18 @@ const CoverLetterEditor = ({ coverLetter, setCoverLetter, selectedResume }) => {
 
     try {
       const result = await dispatch(generateCoverLetter(payload)).unwrap();
-      console.log("result --- ", result)
-      setCoverLetter(result.content);
+      if (generationRequest.current === request) {
+        setCoverLetter(result.content);
+      }
     } catch (error) {
-      console.log("error", error);
+      if (generationRequest.current === request) {
+        setGenerationError(typeof error === "string" ? error : error?.message || "Failed to generate cover letter.");
+      }
+    } finally {
+      if (generationRequest.current === request) {
+        generationRequest.current = null;
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -102,9 +146,25 @@ const CoverLetterEditor = ({ coverLetter, setCoverLetter, selectedResume }) => {
               <Button
                 onClick={handleGenerateCoverLatterWithAi}
                 className={"py-5"}
+                disabled={!resumeReady || isGenerating}
+                aria-busy={isGenerating}
               >
-                <Sparkles className="w-4 h-4" /> Generate with AI
+                <Sparkles className="w-4 h-4" />
+                {isGenerating ? "Generating..." : "Generate with AI"}
               </Button>
+              {!selectedResume ? (
+                <p className="mt-2 text-sm text-slate-700">Select a resume to generate a cover letter.</p>
+              ) : resumeError ? (
+                <div className="mt-2">
+                  <p role="alert" className="text-sm text-red-700">{resumeError}</p>
+                  <Button variant="outline" className="mt-2" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+                    Retry loading resume
+                  </Button>
+                </div>
+              ) : !resumeReady ? (
+                <p role="status" className="mt-2 text-sm text-slate-700">Loading selected resume...</p>
+              ) : null}
+              {generationError && <p role="alert" className="mt-2 text-sm text-red-700">{generationError}</p>}
             </div>
           </div>
         </CardContent>

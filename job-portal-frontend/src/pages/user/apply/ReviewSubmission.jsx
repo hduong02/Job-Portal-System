@@ -90,7 +90,7 @@ const ReviewSubmission = ({
               <span className="text-slate-600">
                 Available From:
               </span>
-              <span className="font-medium text-slate-900">{availableFrom.toLocaleDateString()}</span>
+              <span className="font-medium text-slate-900">{availableFrom?.toLocaleDateString() ?? "Not provided"}</span>
             </p>
           </div>
         </CardContent>

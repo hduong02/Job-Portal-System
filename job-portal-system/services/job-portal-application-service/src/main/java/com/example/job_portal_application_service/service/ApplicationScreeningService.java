@@ -37,7 +37,7 @@ public class ApplicationScreeningService {
 
     @Async("screeningExecutor")
     @Transactional
-    public ApplicationScreening screenAsync(
+    public void screenAsync(
             Long applicationId,
             Long candidateId,
             Long jobId,
@@ -101,8 +101,7 @@ public class ApplicationScreeningService {
                         .concerns(result.getConcerns())
                 .build();
 
-        ApplicationScreening screening = applicationScreeningRepository
-                .save(applicationScreening);
+        applicationScreeningRepository.save(applicationScreening);
 
         applicationRepository.findById(applicationId).ifPresent(app -> {
             app.setAiScore(result.getScore());
@@ -110,7 +109,6 @@ public class ApplicationScreeningService {
             applicationRepository.save(app);
         });
 
-        return screening;
     }
 
     // Software engineer at Meta: handling spring boot project as team lead

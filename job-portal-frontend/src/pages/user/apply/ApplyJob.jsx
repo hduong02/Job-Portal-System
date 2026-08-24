@@ -8,6 +8,7 @@ import ApplySteps from "./ApplySteps";
 import { ArrowRight } from "lucide-react";
 import CoverLetterEditor from "./CoverLetterEditor";
 import { useState } from "react";
+import { useRef } from "react";
 import AdditionalDetails from "./AdditionalDetails";
 import ReviewSubmission from "./ReviewSubmission";
 import SelectResume from "./SelectResume";
@@ -16,6 +17,7 @@ import { submitApplication } from "../../../redux-store/application/applicationT
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchJobById } from "../../../redux-store/job/jobThunk";
+import { format } from "date-fns";
 
 // import { job } from "../jobs/dummyjob";
 
@@ -26,6 +28,10 @@ const ApplyJob = () => {
   const [coverLetter, setCoverLetter] = React.useState("");
   const [expectedSalary, setExpectedSalary] = useState("");
   const [availableFrom, setAvailableFrom] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const submissionLocked = useRef(false);
   const dispatch = useDispatch();
   const { currentJob: job } = useSelector((store) => store.job);
   const { id } = useParams();
@@ -78,15 +84,33 @@ const ApplyJob = () => {
     }
   }
 
-  const handleSubmit = () => {
-    const data = {
-      jobId: id,
-      resumeId: selectedResume,
-      coverLetter: coverLetter,
-      expectedSalary,
-      availableFrom,
-    };
-    dispatch(submitApplication(data));
+  const handleSubmit = async () => {
+    if (submissionLocked.current) return;
+
+    submissionLocked.current = true;
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const data = {
+        jobId: id,
+        resumeId: selectedResume,
+        coverLetter: coverLetter,
+        expectedSalary,
+        availableFrom: availableFrom ? format(availableFrom, "yyyy-MM-dd") : null,
+      };
+      await dispatch(submitApplication(data)).unwrap();
+      setIsSubmitted(true);
+    } catch (error) {
+      setSubmitError(
+        typeof error === "string"
+          ? error
+          : error?.message || "Failed to submit application. Please try again.",
+      );
+      submissionLocked.current = false;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -98,31 +122,49 @@ const ApplyJob = () => {
 
       <JobInfoCard job={job} />
 
-      <ApplySteps currentStep={currentStep} />
+      {isSubmitted ? (
+        <div role="status" className="my-8 rounded-lg border border-green-200 bg-green-50 p-6">
+          <h2 className="text-xl font-semibold text-green-900">Application submitted successfully</h2>
+          <p className="mt-2 text-green-800">Your application has been received.</p>
+          <Button className="mt-4" onClick={() => navigate("/applications")}>View My Applications</Button>
+        </div>
+      ) : (
+        <>
+          <ApplySteps currentStep={currentStep} />
 
-      <div className="my-8">{renderStep()}</div>
+          <div className="my-8">{renderStep()}</div>
 
-      <div className="flex items-center justify-between mt-8">
-        <Button
-          disabled={currentStep === 1}
-          variant="outline"
-          onClick={() => setCurrentStep((prev) => prev - 1)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Previous
-        </Button>
-        {currentStep < 4 ? (
-          <Button
-            onClick={() => setCurrentStep((prev) => prev + 1)}
-            disabled={currentStep === 4}
-          >
-            Next
-            <ArrowRight className="h-4 w-4 mr-2" />
-          </Button>
-        ) : (
-          <Button onClick={handleSubmit}>Submit Application</Button>
-        )}
-      </div>
+          {submitError && (
+            <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+              {submitError}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between mt-8">
+            <Button
+              disabled={currentStep === 1 || isSubmitting}
+              variant="outline"
+              onClick={() => setCurrentStep((prev) => prev - 1)}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            {currentStep < 4 ? (
+              <Button
+                onClick={() => setCurrentStep((prev) => prev + 1)}
+                disabled={currentStep === 4}
+              >
+                Next
+                <ArrowRight className="h-4 w-4 mr-2" />
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={isSubmitting} aria-busy={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Submit Application"}
+              </Button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

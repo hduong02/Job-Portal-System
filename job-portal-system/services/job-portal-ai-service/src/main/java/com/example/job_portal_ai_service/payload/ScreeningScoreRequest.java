@@ -15,4 +15,5 @@ public class ScreeningScoreRequest {
     private String candidateSummary;
     private List<String> candidateSkills;
     private List<String> candidateExperience;
+    private List<String> candidateEducation;
 }
