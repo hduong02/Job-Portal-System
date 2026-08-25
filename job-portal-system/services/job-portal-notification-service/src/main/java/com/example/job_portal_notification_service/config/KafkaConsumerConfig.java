@@ -23,7 +23,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, Object> consumerFactory() {
         JacksonJsonDeserializer<Object> deserializer =
                 new JacksonJsonDeserializer<>(Object.class);
-        deserializer.addTrustedPackages("com.example.job_portal_application_service.*");
+        deserializer.addTrustedPackages("com.example.event");
         deserializer.setUseTypeHeaders(true);
 
         Map<String, Object> props = new HashMap<>();

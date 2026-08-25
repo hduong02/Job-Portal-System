@@ -28,8 +28,8 @@ public class EmailNotificationService {
                     event.getNewStatus().name());
             String statusColor = STATUS_COLORS.getOrDefault(event.getNewStatus(),
                     "#6b7280");
-            String subject="Application update: " + event.getJobTitle() + " at"
-                    + event.getCandidateName();
+            String subject = "Application update: " + event.getJobTitle() + " at "
+                    + event.getCompanyName();
             String body = buildStatusChangeHtml(event, statusColor, statusLabel);
             String candidateEmail = event.getCandidateEmail();
 
