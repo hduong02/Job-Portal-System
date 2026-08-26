@@ -73,7 +73,7 @@ const EmployerApplications = () => {
         .length,
       unread: applications.filter((app) => !app.isRead).length,
       autoShortlisted: applications.filter(
-        (app) => app.aiShortlistStatus === "AUTO_SHORTLISTED",
+        (app) => app.aiShortListStatus === "AUTO_SHORTLISTED",
       ).length,
     }),
     [applications, applicationsPage.totalElements],
@@ -96,7 +96,7 @@ const EmployerApplications = () => {
     if (statusFilter != "ALL") filters.status = statusFilter;
     if (starredOnly) filters.isStarred = true;
     if (unreadOnly) filters.isRead = false;
-    if (aiFilter !== "ALL") filters.aiShortlistStatus = aiFilter;
+    if (aiFilter !== "ALL") filters.aiShortListStatus = aiFilter;
     if (sortBy !== "DEFAULT") {
       filters.sortBy = "aiScore";
       filters.sortDirection = sortBy === "AI_SCORE_ASC" ? "ASC" : "DESC";

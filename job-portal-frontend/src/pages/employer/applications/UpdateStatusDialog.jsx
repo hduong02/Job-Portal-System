@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { updateApplicationStatus } from "../../../redux-store/application/applicationThunk";
@@ -31,27 +31,46 @@ const STATUSES = [
   { value: "REJECTED", label: "Rejected", color: "text-red-600" },
   { value: "HIRED", label: "Hired", color: "text-emerald-600" },
 ];
-  const UpdateStatusDialog = ({
-    open,
-    onClose,
-    applicationId,
-    currentStatus,
-  }) => {
-    const [status,setStatus]=useState(currentStatus || "")
-    const dispatch=useDispatch();
+const UpdateStatusDialog = ({
+  open,
+  onClose,
+  applicationId,
+  currentStatus,
+}) => {
+  const [status, setStatus] = useState(currentStatus || "");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState(null);
+  const submitting = useRef(false);
+  const dispatch = useDispatch();
 
-  const handleSubmit=()=>{
-    dispatch(updateApplicationStatus({
-      id:applicationId,
-      status,
-      note:"employer update status"
-    }))
-    onClose()
-  }
+  const handleClose = () => {
+    if (!submitting.current) onClose();
+  };
+
+  const handleSubmit = async () => {
+    if (submitting.current || !status) return;
+    submitting.current = true;
+    setIsUpdating(true);
+    setError(null);
+
+    try {
+      await dispatch(updateApplicationStatus({
+        id: applicationId,
+        status,
+        note: "employer update status",
+      })).unwrap();
+      onClose();
+    } catch (err) {
+      setError(typeof err === "string" ? err : err?.message || "Failed to update status. Please try again.");
+    } finally {
+      submitting.current = false;
+      setIsUpdating(false);
+    }
+  };
   
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={Boolean(open)} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
+      <DialogContent showCloseButton={!isUpdating}>
         <DialogHeader>
           <DialogTitle>Update Application Status</DialogTitle>
         </DialogHeader>
@@ -59,7 +78,7 @@ const STATUSES = [
         <div className="space-y-5">
           <div className="space-y-4">
             <Label>New Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={setStatus} disabled={isUpdating}>
               <SelectTrigger className="text-sm w-full">
                 <SelectValue placeholder="select status" />
               </SelectTrigger>
@@ -72,9 +91,12 @@ const STATUSES = [
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSubmit}>Update</Button>
+          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+          <div className="flex justify-end gap-2">
+            <Button onClick={handleClose} disabled={isUpdating}>Cancel</Button>
+            <Button onClick={handleSubmit} disabled={isUpdating || !status}>
+              {isUpdating ? "Updating..." : "Update"}
+            </Button>
           </div>
         </div>
       </DialogContent>

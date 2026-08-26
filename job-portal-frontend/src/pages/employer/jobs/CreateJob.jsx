@@ -3,7 +3,7 @@ import JobSection from "./JobSection";
 import { Briefcase } from "lucide-react";
 import { Input } from "../../../components/ui/input";
 import JobField from "./JobField";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import AiButton from "./AiButton";
 import { Layers } from "lucide-react";
@@ -27,7 +27,7 @@ import { Save } from "lucide-react";
 import { Separator } from "../../../components/ui/separator";
 import { Badge } from "../../../components/ui/badge";
 import { useDispatch } from "react-redux";
-import { createJob, fetchJobById } from "../../../redux-store/job/jobThunk";
+import { createJob, fetchJobById, publishJob, updateJob } from "../../../redux-store/job/jobThunk";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import {
@@ -35,7 +35,7 @@ import {
   fetchSkills,
   fetchTags,
 } from "../../../redux-store/jobMeta/jobMetaThunk";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   generateJobBenefits,
   generateJobDescription,
@@ -74,6 +74,11 @@ const CURRENCIES = ["USD", "INR", "EUR", "GBP", "CAD", "AUD", "SGD"];
 const CreateJob = ({ isEdit = false }) => {
   const { jobId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const savedJobId = useRef(null);
+  const submitting = useRef(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [submitError, setSubmitError] = useState(null);
   const { categories, skills, tags } = useSelector((state) => state.jobMeta);
   const { currentJob } = useSelector((state) => state.job);
   const {
@@ -133,9 +138,39 @@ const CreateJob = ({ isEdit = false }) => {
     ["Salary", !!(form.minSalary || form.maxSalary)],
   ];
 
-  const handleSubmit = () => {
-    console.log("form data ", form);
-    dispatch(createJob(form));
+  const handleSubmit = async (action) => {
+    if (submitting.current) return;
+    submitting.current = true;
+    setPendingAction(action);
+    setSubmitError(null);
+    let saved = false;
+
+    try {
+      const id = isEdit ? jobId : savedJobId.current;
+      const job = await dispatch(
+        id ? updateJob({ ...form, id }) : createJob(form),
+      ).unwrap();
+      savedJobId.current = job.id;
+      saved = true;
+
+      if (action === "publish") {
+        await dispatch(publishJob(job.id)).unwrap();
+      }
+
+      navigate("/employer/jobs");
+    } catch (error) {
+      const message = typeof error === "string"
+        ? error
+        : error?.message || "Please try again.";
+      setSubmitError(
+        saved && action === "publish"
+          ? `Your job was saved as a draft, but publishing failed. ${message} Retry Publish Job to publish this draft.`
+          : `Could not save your job. ${message}`,
+      );
+    } finally {
+      submitting.current = false;
+      setPendingAction(null);
+    }
   };
 
   useEffect(() => {
@@ -788,28 +823,35 @@ const CreateJob = ({ isEdit = false }) => {
           <div className="sticky top-6 space-y-4">
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
               <h3>{isEdit ? "Save Changes" : "Publish Job"}</h3>
-              <Button onClick={handleSubmit} className="w-full gap-2 ">
-                <Send className="w-4 h-4" />
-                {isEdit ? "Save Changes" : "Publish Job"}
-              </Button>
               <Button
+                onClick={() => handleSubmit(isEdit ? "save" : "publish")}
+                disabled={pendingAction !== null || (isEdit && (!currentJob || String(currentJob.id) !== jobId))}
+                className="w-full gap-2 "
+              >
+                <Send className="w-4 h-4" />
+                {pendingAction === "publish" ? "Publishing..." : pendingAction === "save" ? "Saving..." : isEdit ? "Save Changes" : "Publish Job"}
+              </Button>
+              {(!isEdit || (String(currentJob?.id) === jobId && currentJob?.status === "DRAFT")) && <Button
+                onClick={() => handleSubmit("draft")}
+                disabled={pendingAction !== null}
                 variant="outline"
                 className="w-full gap-2 border-slate-200"
               >
                 <Save className="h-4 w-4" />
-                {isEdit ? "Save as Draft" : "Save as Draft"}
-              </Button>
+                {pendingAction === "draft" ? "Saving Draft..." : "Save as Draft"}
+              </Button>}
+              {submitError && <p role="alert" className="text-sm text-red-600">{submitError}</p>}
 
               <Separator />
 
               <div className="space-y-1.5 text-xs text-slate-500">
                 <div className="flex justify-between">
-                  <span>Status after save:</span>
+                  <span>{isEdit ? "Status after save:" : "Status after draft save:"}</span>
                   <Badge
                     variant="outline"
                     className="text-xs bg-amber-50 text-amber-700 border-amber-200"
                   >
-                    Draft
+                    {isEdit ? currentJob?.status || "—" : "Draft"}
                   </Badge>
                 </div>
                 <div className="flex justify-between">

@@ -10,8 +10,8 @@ export const fetchCompanyApplications = createAsyncThunk(
       if (filters.jobId!="all") params.jobId = filters.jobId;
       if (filters.status) params.status = filters.status;
       if (filters.isStarred != null) params.isStarred = filters.isStarred;
-      if (filters.aiShortlistStatus)
-        params.aiShortlistStatus = filters.aiShortlistStatus;
+      if (filters.aiShortListStatus)
+        params.aiShortListStatus = filters.aiShortListStatus;
       if (filters.minAiScore != null) params.minAiScore = filters.minAiScore;
       if (filters.sortBy) params.sortBy = filters.sortBy;
       if (filters.sortDirection) params.sortDirection = filters.sortDirection;
