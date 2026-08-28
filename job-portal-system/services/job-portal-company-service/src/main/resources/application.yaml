@@ -1,6 +1,20 @@
+server:
+  port: ${SERVER_PORT:5002}
+
 spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_portal_company}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:admin}}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
   application:
     name: job-portal-company-service
+
   
   data:
     redis:
@@ -17,3 +31,12 @@ spring:
 
   config:
     import: optional:configserver:http://localhost:8888
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true

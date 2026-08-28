@@ -333,7 +333,7 @@ services:
     mem_reservation: 256m
     cpus: 0.5
     ports:
-      - "5004:5004"
+      - "5005:5005"
     depends_on:
       discovery:
         condition: service_healthy
@@ -358,7 +358,7 @@ services:
     mem_reservation: 256m
     cpus: 0.5
     ports:
-      - "5005:5005"
+      - "5006:5006"
     depends_on:
       discovery:
         condition: service_healthy
@@ -383,7 +383,7 @@ services:
     mem_reservation: 256m
     cpus: 0.5
     ports:
-      - "5009:5009"
+      - "5004:5004"
     depends_on:
       discovery:
         condition: service_healthy
@@ -407,13 +407,14 @@ services:
     mem_reservation: 256m
     cpus: 0.5
     ports:
-      - "5010:5010"
+      - "6000:6000"
     depends_on:
       discovery:
         condition: service_healthy
       config-server:
         condition: service_healthy
     environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
