@@ -36,9 +36,9 @@ public class JobController {
 
     @GetMapping("/{id}")
     @Cacheable(value = "jobs", key = "#id")
-    public ResponseEntity<JobResponse> getJobById(
+    public JobResponse getJobById(
             @PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(jobService.getJobById(id));
+        return jobService.getJobById(id);
     }
 
     @GetMapping

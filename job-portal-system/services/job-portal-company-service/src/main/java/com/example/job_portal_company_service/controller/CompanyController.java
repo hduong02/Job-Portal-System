@@ -39,11 +39,10 @@ public class CompanyController {
 
     @GetMapping("/{id}")
     @Cacheable(value = "companies", key = "#id")
-    public ResponseEntity<CompanyResponse> getCompanyById(
+    public CompanyResponse getCompanyById(
             @PathVariable Long id
     ) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(companyService.getCompanyById(id));
+        return companyService.getCompanyById(id);
     }
 
     @GetMapping("/my")

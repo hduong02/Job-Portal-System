@@ -12,7 +12,7 @@ import Dashboard from "./pages/employer/dashboard/Dashboard";
 import EmployerJobs from "./pages/employer/jobs/EmployerJobs";
 import CreateJob from "./pages/employer/jobs/CreateJob";
 import EmployerApplications from "./pages/employer/applications/EmployerApplications";
-import AIScreening from "./pages/employer/aiScreening/AiScreening";
+import AIScreening from "./pages/employer/aiScreening/AIScreening";
 import CompanyProfile from "./pages/employer/companyProfile/CompanyProfile";
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
 import AdminUsers from "./pages/admin/users/AdminUsers";
