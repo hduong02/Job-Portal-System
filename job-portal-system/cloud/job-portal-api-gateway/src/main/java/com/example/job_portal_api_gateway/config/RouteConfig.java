@@ -9,6 +9,8 @@ import org.springframework.web.servlet.function.*;
 
 import com.example.job_portal_api_gateway.jwt.JwtConstant;
 import com.example.job_portal_api_gateway.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
@@ -140,14 +142,17 @@ public class RouteConfig {
 //        Bearer token
         String token = authHeader.substring(JwtConstant.TOKEN_PREFIX.length());
 
-        if (!jwtUtil.isTokenValid(token)) {
+        Claims claims;
+        try {
+            claims = jwtUtil.extractAllClaims(token);
+        } catch (JwtException | IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "Invalid or expired JWT token");
         }
 
-        String email = jwtUtil.extractEmail(token);
-        String authorities = jwtUtil.extractAuthorities(token);
-        Long userId = jwtUtil.extractUserId(token);
+        String email = claims.get("email", String.class);
+        String authorities = claims.get("authorities", String.class);
+        Long userId = claims.get("userId", Long.class);
 
         if (request.method() == HttpMethod.PATCH
                 && request.path().matches("/api/companies/[^/]+/(verify|deactivate)")

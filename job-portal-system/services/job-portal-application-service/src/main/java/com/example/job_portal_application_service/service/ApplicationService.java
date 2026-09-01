@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.example.domain.ApplicationStatus;
 import com.example.dto.response.ApplicationResponse;
+import com.example.job_portal_application_service.payload.ApplicationStatusResponse;
 import com.example.job_portal_application_service.model.Application;
 import com.example.job_portal_application_service.payload.CompanyApplicationFilterRequest;
 import com.example.job_portal_application_service.payload.CreateApplicationRequest;
@@ -26,7 +27,7 @@ public interface ApplicationService {
     Page<ApplicationResponse> getApplicationsForCompany(Long userId,
             CompanyApplicationFilterRequest filter, Pageable pageable);
 
-    ApplicationResponse updateStatus(
+    ApplicationStatusResponse updateStatus(
             Long applicationId,
             Long employerId,
             ApplicationStatus status) throws Exception;

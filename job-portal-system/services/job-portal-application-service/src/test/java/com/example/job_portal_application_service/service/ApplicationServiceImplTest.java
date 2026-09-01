@@ -1,12 +1,14 @@
 package com.example.job_portal_application_service.service;
 
 import com.example.domain.JobStatus;
+import com.example.domain.ApplicationStatus;
 import com.example.dto.response.JobResponse;
 import com.example.job_portal_application_service.client.CompanyClient;
 import com.example.job_portal_application_service.client.JobClient;
 import com.example.job_portal_application_service.client.ResumeClient;
 import com.example.job_portal_application_service.client.UserClient;
 import com.example.job_portal_application_service.event.ApplicationEventPublisher;
+import com.example.job_portal_application_service.event.ApplicationStatusChange;
 import com.example.job_portal_application_service.model.Application;
 import com.example.job_portal_application_service.payload.CreateApplicationRequest;
 import com.example.job_portal_application_service.repository.ApplicationNoteRepository;
@@ -30,11 +32,15 @@ class ApplicationServiceImplTest {
     private final ApplicationRepository applications = mock(ApplicationRepository.class);
     private final JobClient jobs = mock(JobClient.class);
     private final ResumeClient resumes = mock(ResumeClient.class);
+    private final ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+    private final ApplicationNoteRepository notes = mock(ApplicationNoteRepository.class);
+    private final ApplicationScreeningRepository screenings = mock(ApplicationScreeningRepository.class);
+    private final CompanyClient companies = mock(CompanyClient.class);
+    private final UserClient users = mock(UserClient.class);
+    private final ApplicationStatusUpdater statusUpdater = mock(ApplicationStatusUpdater.class);
     private final ApplicationServiceImpl service = new ApplicationServiceImpl(
-            mock(ApplicationEventPublisher.class), applications,
-            mock(ApplicationNoteRepository.class), mock(ApplicationScreeningService.class),
-            mock(ApplicationScreeningRepository.class), jobs,
-            resumes, mock(CompanyClient.class), mock(UserClient.class));
+            publisher, statusUpdater, applications, notes, mock(ApplicationScreeningService.class),
+            screenings, jobs, resumes, companies, users);
 
     @Test
     void rejectsJobsThatAreNotAcceptingApplications() {
@@ -83,5 +89,27 @@ class ApplicationServiceImplTest {
 
         assertEquals(HttpStatus.FORBIDDEN, error.getStatusCode());
         verifyNoInteractions(applications);
+    }
+    @Test
+    void statusUpdateReturnsCompactPatchWithoutRebuildingDetails() throws Exception {
+        var change = new ApplicationStatusChange(1L, 2L, 5L, 6L, ApplicationStatus.PENDING,
+                ApplicationStatus.SHORTLISTED, java.time.LocalDateTime.of(2026, 10, 9, 12, 0));
+        when(statusUpdater.updateStatus(1L, 3L, ApplicationStatus.SHORTLISTED)).thenReturn(change);
+        var result = service.updateStatus(1L, 3L, ApplicationStatus.SHORTLISTED);
+        assertEquals(1L, result.id());
+        assertEquals(ApplicationStatus.SHORTLISTED, result.status());
+        assertEquals(change.updatedAt(), result.updatedAt());
+        verify(publisher).publishStatusChange(change, "Your application status has changed");
+        verifyNoInteractions(applications);
+        verifyNoInteractions(jobs, companies, users, notes, screenings, resumes);
+    }
+
+    @Test
+    void statusUpdateRejectsAnotherEmployerBeforeSavingOrPublishing() throws Exception {
+        when(statusUpdater.updateStatus(1L, 4L, ApplicationStatus.SHORTLISTED))
+                .thenThrow(new Exception("You are not the employer for this application"));
+        assertThrows(Exception.class, () -> service.updateStatus(1L, 4L, ApplicationStatus.SHORTLISTED));
+        verify(applications, never()).save(any());
+        verifyNoInteractions(publisher);
     }
 }

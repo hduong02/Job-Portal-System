@@ -2,6 +2,7 @@ package com.example.job_portal_application_service.controller;
 
 import com.example.domain.ApplicationStatus;
 import com.example.dto.response.ApplicationResponse;
+import com.example.job_portal_application_service.payload.ApplicationStatusResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
 import com.example.dto.response.UserResponse;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -115,5 +117,19 @@ class ApplicationControllerSmokeTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+    }
+    @Test
+    void statusUpdateReturnsOnlyStatusPatch() throws Exception {
+        when(applicationService.updateStatus(1L, 3L, ApplicationStatus.SHORTLISTED))
+                .thenReturn(new ApplicationStatusResponse(1L, ApplicationStatus.SHORTLISTED,
+                        LocalDateTime.of(2026, 10, 8, 12, 0)));
+        mockMvc.perform(patch("/api/applications/1/status").header("X-User-Id", 3L)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"SHORTLISTED\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.status").value("SHORTLISTED"))
+                .andExpect(jsonPath("$.updatedAt").exists())
+                .andExpect(jsonPath("$.job").doesNotExist())
+                .andExpect(jsonPath("$.candidate").doesNotExist())
+                .andExpect(jsonPath("$.notes").doesNotExist());
     }
 }

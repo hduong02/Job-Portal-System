@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.response.ApiResponse;
 import com.example.dto.response.ApplicationResponse;
+import com.example.job_portal_application_service.payload.ApplicationStatusResponse;
 import com.example.job_portal_application_service.payload.CompanyApplicationFilterRequest;
 import com.example.job_portal_application_service.payload.CreateApplicationRequest;
 import com.example.job_portal_application_service.payload.UpdateApplicationStatusRequest;
@@ -76,7 +77,7 @@ public class ApplicationController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<ApplicationResponse> updateStatus(
+    public ResponseEntity<ApplicationStatusResponse> updateStatus(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long employerId,
             @RequestBody @Valid UpdateApplicationStatusRequest req)

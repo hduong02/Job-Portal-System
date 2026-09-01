@@ -1,6 +1,7 @@
 package com.example.job_portal_application_service.service.impl;
 
 import com.example.job_portal_application_service.event.ApplicationEventPublisher;
+import com.example.job_portal_application_service.service.ApplicationStatusUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.domain.ApplicationStatus;
 import com.example.domain.JobStatus;
 import com.example.dto.response.ApplicationResponse;
+import com.example.job_portal_application_service.payload.ApplicationStatusResponse;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.JobResponse;
 import com.example.dto.response.ResumeResponse;
@@ -42,6 +44,7 @@ import java.time.LocalDate;
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationStatusUpdater statusUpdater;
     private final ApplicationRepository applicationRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
     private final ApplicationScreeningService applicationScreeningService;
@@ -142,29 +145,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationResponse updateStatus(
+    public ApplicationStatusResponse updateStatus(
             Long applicationId,
             Long employerId,
             ApplicationStatus status) throws Exception {
 
-        Application application = getApplicationEntity(applicationId);
-        ApplicationStatus oldStatus = application.getStatus();
-        assertEmployer(application, employerId);
-
-        if (application.getStatus() == ApplicationStatus.WITHDRAWN){
-            throw new Exception("Candidate have already withdrawn");
-        }
-        application.setStatus(status);
-        Application savedApplication = applicationRepository.save(application);
-
-        applicationEventPublisher.publishStatusChange(
-                savedApplication,
-                oldStatus,
-                status,
-                "Your application status has changed"
-        );
-
-        return buildFullResponse(savedApplication);
+        var change = statusUpdater.updateStatus(applicationId, employerId, status);
+        applicationEventPublisher.publishStatusChange(change, "Your application status has changed");
+        return change.response();
     }
 
     @Override

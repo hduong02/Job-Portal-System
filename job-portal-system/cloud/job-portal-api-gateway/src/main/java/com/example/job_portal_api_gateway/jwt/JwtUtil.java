@@ -1,6 +1,7 @@
 package com.example.job_portal_api_gateway.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,12 @@ import javax.crypto.SecretKey;
 public class JwtUtil {
 
     private final SecretKey secretKey = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
+    private final JwtParser parser = Jwts.parser()
+            .verifyWith(secretKey)
+            .build();
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
+        return parser.parseSignedClaims(token)
                 .getPayload();
     }
 
