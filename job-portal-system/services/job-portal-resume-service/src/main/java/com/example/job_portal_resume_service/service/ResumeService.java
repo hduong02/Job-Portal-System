@@ -32,4 +32,6 @@ public interface ResumeService {
 
     Resume getResumeEntity(Long resumeId) throws Exception;
 
+    Resume getOwnedResumeEntity(Long resumeId, Long candidateId);
+
 }

@@ -15,9 +15,10 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 7. [Security](#security)
 8. [API Reference](#api-reference)
 9. [Running the Project](#running-the-project)
-10. [Smoke Test](#smoke-test)
+10. [Tests](#tests)
 11. [Configuration](#configuration)
 12. [Known Limitations](#known-limitations)
+13. [UI Screenshots](#ui-screenshots)
 
 ---
 
@@ -57,7 +58,7 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 
 ## Architecture Overview
 
-![Job Portal system architecture](docs/archietecture/architecture.png)
+![Job Portal system architecture](docs/architecture/architecture.png)
 
 Text version for terminal readers:
 
@@ -177,17 +178,6 @@ Employer → PATCH /api/applications/{id}/status
 
 AI shortlist categories are derived from the overall score: `AUTO_SHORTLISTED` (90+), `REVIEW_RECOMMENDED` (75–89), `PENDING_REVIEW` (50–74), and `LOW_MATCH` (below 50). They are stored separately from the employer-managed application status.
 
-### Application Status Email Content
-
-The HTML email sent after an employer status update includes:
-
-- **Header** — Color-coded “Application Status Update” heading
-- **Greeting** — Candidate's name
-- **Job Details** — Job title and company name
-- **Status Badge** — Human-readable hiring status
-- **Portal Reminder** — Instructions to log in and view the application
-- **Footer** — Job Portal branding and reason for receiving the email
-
 ---
 
 ## Technology Stack
@@ -269,7 +259,7 @@ The local AI configuration selects `gemini-3.5-flash-lite`; availability depends
 | Docker Compose | Full stack and local development infrastructure |
 | pnpm | Frontend dependency management (lockfile included) |
 | Lombok | Compile-time boilerplate generation |
-| k6 | Live register/resume/search/apply smoke test |
+| Node.js / k6 | Whole-system API smoke suite / shortlist stress test |
 
 ---
 
@@ -467,7 +457,7 @@ Controllers return Spring Data `Page` objects; additional pagination metadata ma
 - Node.js compatible with Vite 8 and pnpm
 - Git
 - A Gemini API key for AI features
-- k6 for the live smoke test
+- Node.js 22+ or Docker for the smoke suite; k6 for stress testing
 
 ### Quick Start (Docker Compose)
 
@@ -488,14 +478,23 @@ mvn -f job-portal-system/pom.xml clean install -DskipTests
 # Docker must be running. Build only executable services with Jib.
 mvn -f job-portal-system/pom.xml -pl cloud/job-portal-config-server,cloud/job-portal-service-registry,cloud/job-portal-api-gateway,services/job-portal-user-service,services/job-portal-company-service,services/job-portal-job-service,services/job-portal-resume-service,services/job-portal-application-service,services/job-portal-preference-service,services/job-portal-ai-service,services/job-portal-notification-service compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -Djib.from.image=eclipse-temurin:25-jre -DskipTests
 
-# 5. Start the stack
-docker compose --env-file docker/.env -f docker/docker-compose.yml up -d
-docker compose --env-file docker/.env -f docker/docker-compose.yml ps
+# 5. Start the stack with the locally built gateway image
+docker compose --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.local.yml up -d
+docker compose --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.local.yml ps
 ```
 
 Compose forwards `GEMINI_API_KEY` from `docker/.env` to the AI container when started with `--env-file docker/.env`. The Config Server must also be able to access its configured Git repository.
 
-Compose runs Docker images; building JARs alone does not update those images. To use published images, skip steps 3–4 and run `docker compose --env-file docker/.env -f docker/docker-compose.yml pull` before starting. The configured `latest` images must be available in the registry.
+Compose runs Docker images; building JARs alone does not update those images. The base Compose file pins the gateway to a published digest. The local override selects the `:latest` gateway image built in step 4 and prevents Compose from pulling a replacement. Include both Compose files in subsequent commands when using local images.
+
+To use published images, skip steps 3–4 and omit the local override:
+
+```powershell
+docker compose --env-file docker/.env -f docker/docker-compose.yml pull
+docker compose --env-file docker/.env -f docker/docker-compose.yml up -d
+```
+
+The configured image tags and gateway digest must be available in the registry.
 
 The API is available at [http://localhost:5000](http://localhost:5000), Eureka at [http://localhost:8761](http://localhost:8761), and captured email at [http://localhost:8025](http://localhost:8025). Compose does not include the frontend.
 
@@ -559,24 +558,88 @@ The full Compose stack overrides notification SMTP settings directly to use `mai
 
 ---
 
-## Smoke Test
+## Tests
 
-The repository includes a k6 test for **register → create resume → search → apply → verify stored application** at [docs/tests/smoke test/register-resume-search-apply.js](docs/tests/smoke%20test/register-resume-search-apply.js).
+Start the backend and required infrastructure, then run the smoke suite before cache or stress testing. The smoke suite creates its own fixtures; seed mock data for cache and stress tests. Run the commands below from the repository root in PowerShell unless noted otherwise.
 
-Start the backend and required infrastructure, and seed at least one active `OPEN` job matching the search keyword with valid application deadlines. The test creates a new job seeker, a private default resume, and a pending application; these records persist after the run.
+### Populate Mock Data Before Testing
 
-From the repository root in PowerShell:
+The recorded VPS was seeded in two stages:
 
-```powershell
-k6 run 'docs/tests/smoke test/register-resume-search-apply.js'
+1. [General seed](docs/vps/seeding/seed-vps-scale.py): back up databases, reserve IDs, insert users → companies → resumes → jobs → applications, then verify relationships and counts. The run reached **10,000 users, 2,000 companies, 50,000 jobs, 50,000 applications, and 8,000 resumes**. Existing categories, skills, and tags are required; synthetic users are inactive.
+2. [Shortlist seed](docs/vps/seeding/seed-vps-shortlist.py): add an active test employer, a dedicated company, 30 open jobs, and **239,970 pending applications** using existing candidates and resumes.
 
-# Override the gateway URL or job search keyword
-k6 run -e BASE_URL=http://localhost:5000 -e KEYWORD=Java 'docs/tests/smoke test/register-resume-search-apply.js'
+Initial commands on the recorded VPS:
+
+```bash
+python3 /root/job-portal-scale/docs/seed-vps-scale.py
+python3 /root/seed-vps-shortlist.py
 ```
 
-The test runs one virtual user and one iteration. It requires all checks to pass, no failed HTTP requests, and at least one completed flow. Success logs `PASS: register -> create resume -> search -> apply` with the created IDs. It does not verify completed AI screening or email delivery.
+These scripts insert directly into PostgreSQL without AI screening, Kafka events, or emails. They depend on the recorded VPS schema, container names, and dataset. Keep backups and manifests: use `--verify-only` for an existing general seed or `--resume` for recovery. Shortlist reruns do not reset statuses. See the [general](docs/vps/seeding/vps-scale-seeding.md) and [shortlist](docs/vps/seeding/vps-shortlist-seeding.md) seeding reports for details.
 
-To run the backend's unit and controller tests:
+### Smoke Test
+
+Runs a sequential recruitment journey through the gateway: accounts, company/job setup, resumes, search, saved jobs, applications, real Gemini generation/screening, Kafka/MailHog email delivery, and authorization checks. Requires an active admin account, working Gemini and notification services, and Node.js 22+ or Docker.
+
+Run on the VPS (prompts for admin credentials and a disposable-account password):
+
+```bash
+bash docs/tests/system-smoke/run-vps.sh
+```
+
+Defaults: gateway `http://127.0.0.1:5000`, MailHog `http://127.0.0.1:8025`. Add `--preflight` for infrastructure checks. Reports and recovery manifests are saved to `docs/tests/system-smoke/results/<run-id>/`; exit codes are `0` (pass), `1` (failure), and `2` (blocked). The suite attempts fixture cleanup; missing AI results or matching emails prevent a pass.
+
+See the [smoke suite guide](docs/tests/system-smoke/README.md) for remote PowerShell setup, cleanup recovery, and offline runner verification.
+
+[Recorded results (12 October 2026)](docs/tests/system-smoke/DEPLOYMENT-REPORT.md): **two live runs passed, with 464/464 and 462/462 assertions**, including real AI screening and Kafka/MailHog email delivery; both had zero cleanup leftovers or uncertain mutations.
+
+### Cache Test
+
+Measures company and job detail reads, first across up to 1,000 distinct IDs, then repeated reads for 20 seconds. The recorded controlled run targeted **150 RPS per phase**. Checks response IDs and unchanged payloads.
+
+```powershell
+$env:BASE_URL = 'http://localhost:5000'
+$env:RPS = '150'
+$env:PRECISE_SCHEDULING = 'yes'
+# Optional: set API_TOKEN, or TEST_EMAIL and TEST_PASSWORD
+node 'docs/tests/cache-performance/cache-performance.cjs'
+```
+
+[Controlled results](docs/tests/cache-performance/cache-performance-report.md):
+
+| Endpoint | p50 latency reduction | p95 latency reduction | p99 latency reduction |
+|---|---:|---:|---:|
+| Company detail | 1.26% | 36.65% | 55.76% |
+| Job detail | 17.79% | 50.57% | 49.92% |
+
+Warmed company reads reduced **p50 by 1.26%, p95 by 36.65%, and p99 by 55.76%**; warmed job reads reduced **p50 by 17.79%, p95 by 50.57%, and p99 by 49.92%**. Across **8,000 measured requests** (1,000 cold and 3,000 warm per endpoint), there were **0 response/correctness errors** and **0 dropped arrivals**. Percentages compare end-to-end cold and warm timings using `(cold − warm) / cold × 100`, calculated from unrounded measurements.
+
+The recorded run used `https://api.jobportal.tech`, with selected Redis keys verified absent before cold reads and present after cold and warm reads. These are observed deployment latency reductions; phase duration, network effects, concurrent traffic, and the warm company cache used by job enrichment limit causal comparisons.
+
+### Stress Test
+
+Updates distinct seeded applications from `PENDING` to `SHORTLISTED` and checks the Kafka/MailHog pipeline. k6 ramps through **5–320 virtual users**, with a 10-second ramp and 30-second hold per level (**280 seconds**). Thresholds: **p95 <500 ms, p99 <1,000 ms, success >99.9%**.
+
+The recorded run used Windows k6 through four pinned SSH connections to the VPS loopback gateway; timings include SSH/network overhead. Each row measures a 30-second hold, excluding ramps and including requests that finish after the hold.
+
+[Recorded results](docs/tests/shortlist-stress/ramping-vus.md) and [run data](docs/tests/shortlist-stress/ramping-vus.json):
+
+| Virtual users | Successful requests/s | p95 | p99 | Hold thresholds |
+|---|---:|---:|---:|---|
+| 5 | 40.13 | 155.25 ms | 193.94 ms | Pass |
+| 10 | 106.93 | 120.80 ms | 159.61 ms | Pass |
+| 20 | 250.70 | 122.60 ms | 163.08 ms | Pass |
+| 40 | 335.27 | 204.12 ms | 257.61 ms | Pass |
+| 80 | 356.23 | 342.64 ms | 423.99 ms | Pass |
+| 160 | 332.97 | 702.14 ms | 775.52 ms | Fail |
+| 320 | 320.37 | 1,391.70 ms | 1,675.26 ms | Fail |
+
+Highest passing throughput: **356.23 RPS at 80 users**, with **p95 342.64 ms** and **p99 423.99 ms**. The full **280-second profile** completed; all **68,826 requests** succeeded, with **0 failures, timeouts, or server 5xx responses**. After notification drain, aggregate counts matched at **68,826 database updates, Kafka events, and captured emails**, and final Kafka lag was **0**. This reconciliation checks aggregate counts; individual message delivery was not audited. The 160- and 320-user holds failed latency thresholds, causing k6 to exit **99**. The stress report provides p95 and p99 per hold, without a before/after comparison or p50 results from which to calculate reductions.
+
+The [preserved scripts](docs/tests/shortlist-stress/scripts/) require the setup in the report, private employer credentials, new artifact directories, and enough pending fixtures. Kafka, notification-service, and MailHog must be running.
+
+### Unit and Controller Tests
 
 ```powershell
 mvn -f job-portal-system/pom.xml test
@@ -619,6 +682,22 @@ The full Compose stack overrides most services to use the required import `confi
 
 ---
 
+## UI Screenshots
+
+### Job Seeker
+
+![Job seeker interface](docs/images/job%20seeker.PNG)
+
+### Employer
+
+![Employer interface](docs/images/employer.PNG)
+
+### Admin
+
+![Admin interface](docs/images/admin.PNG)
+
+---
+
 ## Project Structure
 
 ```text
@@ -652,8 +731,10 @@ Job Portal System/
 ├── job-portal-config/                        # Service YAML configuration
 ├── job-portal-frontend/                      # React + Vite frontend
 ├── docs/
-│   ├── archietecture/                       # Architecture PNG and SVG
-│   └── tests/smoke test/                    # k6 workflow test
+│   ├── architecture/                       # Architecture PNG and SVG
+│   ├── images/                             # UI screenshots
+│   ├── tests/                              # Smoke, cache, and shortlist stress tests
+│   └── vps/                                # Seeding and notification maintenance
 └── README.md
 ```
 

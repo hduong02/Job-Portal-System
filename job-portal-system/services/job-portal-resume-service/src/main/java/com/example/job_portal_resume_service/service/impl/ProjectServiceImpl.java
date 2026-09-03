@@ -1,5 +1,7 @@
 package com.example.job_portal_resume_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +50,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponse> getAllProjects(Long resumeId) {
+    public List<ProjectResponse> getAllProjects(Long resumeId, Long candidateId) {
+        resumeService.getOwnedResumeEntity(resumeId, candidateId);
         return projectRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
                 .stream().map(ResumeMapper::toProjectResponse).toList();
     }
@@ -61,7 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
             AddProjectRequest req) throws Exception {
         
         Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new Exception("Project not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
         );
         assertOwner(project.getResume(), candidateId);
 
@@ -85,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
             Long candidateId) throws Exception {
         
         Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new Exception("Project not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
         );
         assertOwner(project.getResume(), candidateId);
         projectRepository.delete(project);
@@ -93,7 +96,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if(!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("Resume not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
         }
     }
 }

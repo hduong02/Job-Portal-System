@@ -1,0 +1,4 @@
+services:
+  gateway:
+    image: andyy02/job-portal-api-gateway:latest
+    pull_policy: never

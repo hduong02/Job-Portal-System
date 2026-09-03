@@ -31,8 +31,9 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getProjects(
-            @PathVariable Long resumeId) {
-        return ResponseEntity.ok(projectService.getAllProjects(resumeId));
+            @PathVariable Long resumeId,
+            @RequestHeader("X-User-Id") Long candidateId) {
+        return ResponseEntity.ok(projectService.getAllProjects(resumeId, candidateId));
     }
 
     @PutMapping("/{projectId}")

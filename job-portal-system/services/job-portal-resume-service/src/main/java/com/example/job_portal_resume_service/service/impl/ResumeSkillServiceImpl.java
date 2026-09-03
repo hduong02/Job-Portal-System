@@ -1,5 +1,7 @@
 package com.example.job_portal_resume_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,8 @@ public class ResumeSkillServiceImpl implements ResumeSkillService {
     }
 
     @Override
-    public List<ResumeSkillResponse> getSkills(Long resumeId) {
+    public List<ResumeSkillResponse> getSkills(Long resumeId, Long candidateId) {
+        resumeService.getOwnedResumeEntity(resumeId, candidateId);
         return resumeSkillRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
                 .stream().map(ResumeMapper::toSkillResponse).toList();
     }
@@ -55,7 +58,7 @@ public class ResumeSkillServiceImpl implements ResumeSkillService {
             Long candidateId,
             AddResumeSkillRequest req) throws Exception {
         ResumeSkill skill = resumeSkillRepository.findById(skillId).orElseThrow(
-                () -> new Exception("Skill not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found")
         );
         assertOwner(skill.getResume(), candidateId);
 
@@ -70,7 +73,7 @@ public class ResumeSkillServiceImpl implements ResumeSkillService {
     @Override
     public void deleteSkill(Long skillId, Long resumeId, Long candidateId) throws Exception {
         ResumeSkill skill = resumeSkillRepository.findById(skillId).orElseThrow(
-                () -> new Exception("Skill not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found")
         );
         assertOwner(skill.getResume(), candidateId);
         resumeSkillRepository.delete(skill);
@@ -78,7 +81,7 @@ public class ResumeSkillServiceImpl implements ResumeSkillService {
 
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if(!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("resume not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "resume not found");
         }
     }
 

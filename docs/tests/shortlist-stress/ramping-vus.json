@@ -1,0 +1,826 @@
+{
+  "run": {
+    "rate": null,
+    "executor": "ramping-vus",
+    "vu_steps": [
+      5,
+      10,
+      20,
+      40,
+      80,
+      160,
+      320
+    ],
+    "ramp_seconds": 10,
+    "hold_seconds": 30,
+    "vus": 320,
+    "duration_seconds": 280,
+    "timeout_seconds": 5,
+    "retries": false,
+    "generator": "Windows PC-local k6",
+    "topology": "Windows k6 -> 4 pinned SSH connections -> VPS loopback gateway :5000",
+    "gateway_memory_mib": 512,
+    "gateway_cpu": 0.5,
+    "application_memory_mib": 1024,
+    "application_cpu": 1.0,
+    "host_memory_stop_mib": 1536,
+    "mailhog_rss_stop_mib": 768,
+    "existing_emails_preserved": false,
+    "mailhog_cleared_before_load": true,
+    "remote_directory": "/root/job-portal-shortlist-loadtest-20261007/ramping-vus-clean-mailhog-20261009",
+    "private_jwt_removed": true,
+    "started_at_utc": "2026-10-09T15:23:30.267214+00:00",
+    "pc_k6_pid": 1152,
+    "pc_k6_executable": "D:\\Java Projects\\Job Portal System\\.loadtest\\k6\\k6-v2.3.0-windows-amd64\\k6.exe",
+    "k6_exit_code": 99,
+    "finished_at_utc": "2026-10-09T15:28:11.664059+00:00",
+    "resource_stop": false,
+    "stop_reasons": [],
+    "pipeline": {
+      "new_shortlisted_rows": 68826,
+      "new_kafka_records": 68826,
+      "new_mailhog_messages": 68826,
+      "final_kafka_lag": 0,
+      "count_reconciliation_passed": true,
+      "identity_level_audit_performed": false
+    },
+    "post_load_health": "passed",
+    "gateway_restarted_for_recovery": false,
+    "resource_stop_during_drain": true,
+    "guard_reason_during_drain": "MailHog RSS above 768 MiB",
+    "vps_k6_running": false,
+    "child_processes_stopped": true
+  },
+  "full_workload_completed": true,
+  "mailhog_cleanup": {
+    "messages_before": 9656,
+    "delete_http_status": 200,
+    "messages_remaining": 0,
+    "mailhog_restarted_to_release_memory": false,
+    "rss_before_mib": 128.7,
+    "rss_after_mib": 128.7
+  },
+  "preparation": {
+    "executor": "ramping-vus",
+    "vu_steps": [
+      5,
+      10,
+      20,
+      40,
+      80,
+      160,
+      320
+    ],
+    "ramp_seconds": 10,
+    "hold_seconds": 30,
+    "duration_seconds": 280,
+    "vus": 320,
+    "timeout_seconds": 5,
+    "generator": "Windows PC-local k6",
+    "status_resets": false,
+    "selected_pending_fixtures": 90000,
+    "resource_guards": {
+      "host_available_memory_min_mib": 1536,
+      "preflight_host_memory_min_mib": 1920,
+      "mailhog_rss_max_mib": 768,
+      "bounded_service_memory_fraction": 0.97
+    },
+    "baseline": {
+      "at_utc": "2026-10-09T15:23:13.543151+00:00",
+      "available_memory_mb": 2344.2,
+      "services": {
+        "job-portal-gateway": {
+          "memory_mib": 299.3,
+          "rss_mib": 321.6,
+          "cpu_stat": {
+            "usage_usec": 46282967,
+            "user_usec": 41323753,
+            "system_usec": 4959214,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 5645,
+            "nr_throttled": 659,
+            "throttled_usec": 49811864,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-application-service": {
+          "memory_mib": 391.4,
+          "rss_mib": 412.9,
+          "cpu_stat": {
+            "usage_usec": 221611416,
+            "user_usec": 155202700,
+            "system_usec": 66408715,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 43986,
+            "nr_throttled": 174,
+            "throttled_usec": 8424679,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "100000 100000"
+        },
+        "job-portal-notification-service": {
+          "memory_mib": 341.9,
+          "rss_mib": 352.2,
+          "cpu_stat": {
+            "usage_usec": 1388540524,
+            "user_usec": 579807132,
+            "system_usec": 808733392,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 707489,
+            "nr_throttled": 536,
+            "throttled_usec": 43654628,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-mailhog": {
+          "memory_mib": 122.0,
+          "rss_mib": 128.7,
+          "cpu_stat": {
+            "usage_usec": 20251439,
+            "user_usec": 13326521,
+            "system_usec": 6924917,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 0,
+            "nr_throttled": 0,
+            "throttled_usec": 0,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "max 100000"
+        },
+        "job-portal-user-service": {
+          "memory_mib": 410.9,
+          "rss_mib": 422.7,
+          "cpu_stat": {
+            "usage_usec": 867040198,
+            "user_usec": 433308048,
+            "system_usec": 433732149,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 631594,
+            "nr_throttled": 881,
+            "throttled_usec": 64750055,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-applicationdb": {
+          "memory_mib": 331.5,
+          "rss_mib": 15.2,
+          "cpu_stat": {
+            "usage_usec": 1909277436,
+            "user_usec": 1121710040,
+            "system_usec": 787567396,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 158227,
+            "nr_throttled": 21177,
+            "throttled_usec": 522792686,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-userdb": {
+          "memory_mib": 48.3,
+          "rss_mib": 15.0,
+          "cpu_stat": {
+            "usage_usec": 1732394112,
+            "user_usec": 1027444859,
+            "system_usec": 704949252,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 139057,
+            "nr_throttled": 21277,
+            "throttled_usec": 470920068,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        }
+      },
+      "mailhog_total": 0,
+      "kafka": [
+        {
+          "partition": 0,
+          "committed": 304221,
+          "end": 304221,
+          "lag": 0
+        }
+      ],
+      "published_total": 304221,
+      "lag": 0,
+      "database_status_counts": {
+        "PENDING": 98191,
+        "SHORTLISTED": 141779
+      },
+      "vps_k6_running": false
+    }
+  },
+  "hold_measurements": [
+    {
+      "vus": 5,
+      "hold_seconds": 30,
+      "requests": 1204,
+      "http_200": 1204,
+      "requests_per_second": 40.13333333333333,
+      "successful_requests_per_second": 40.13333333333333,
+      "success_rate": 1.0,
+      "p95_ms": 155.25257499999992,
+      "p99_ms": 193.93906900000005,
+      "average_ms": 124.56566237541543,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": true
+    },
+    {
+      "vus": 10,
+      "hold_seconds": 30,
+      "requests": 3208,
+      "http_200": 3208,
+      "requests_per_second": 106.93333333333334,
+      "successful_requests_per_second": 106.93333333333334,
+      "success_rate": 1.0,
+      "p95_ms": 120.803915,
+      "p99_ms": 159.6070029999999,
+      "average_ms": 93.40010539276822,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": true
+    },
+    {
+      "vus": 20,
+      "hold_seconds": 30,
+      "requests": 7521,
+      "http_200": 7521,
+      "requests_per_second": 250.7,
+      "successful_requests_per_second": 250.7,
+      "success_rate": 1.0,
+      "p95_ms": 122.6039,
+      "p99_ms": 163.08036,
+      "average_ms": 79.56945856933892,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": true
+    },
+    {
+      "vus": 40,
+      "hold_seconds": 30,
+      "requests": 10058,
+      "http_200": 10058,
+      "requests_per_second": 335.26666666666665,
+      "successful_requests_per_second": 335.26666666666665,
+      "success_rate": 1.0,
+      "p95_ms": 204.12435499999998,
+      "p99_ms": 257.6083450000001,
+      "average_ms": 119.24420066613614,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": true
+    },
+    {
+      "vus": 80,
+      "hold_seconds": 30,
+      "requests": 10687,
+      "http_200": 10687,
+      "requests_per_second": 356.23333333333335,
+      "successful_requests_per_second": 356.23333333333335,
+      "success_rate": 1.0,
+      "p95_ms": 342.64315,
+      "p99_ms": 423.9912819999996,
+      "average_ms": 224.95251209881144,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": true
+    },
+    {
+      "vus": 160,
+      "hold_seconds": 30,
+      "requests": 9989,
+      "http_200": 9989,
+      "requests_per_second": 332.96666666666664,
+      "successful_requests_per_second": 332.96666666666664,
+      "success_rate": 1.0,
+      "p95_ms": 702.1433400000001,
+      "p99_ms": 775.5189320000011,
+      "average_ms": 476.25802047251767,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": false
+    },
+    {
+      "vus": 320,
+      "hold_seconds": 30,
+      "requests": 9611,
+      "http_200": 9611,
+      "requests_per_second": 320.3666666666667,
+      "successful_requests_per_second": 320.3666666666667,
+      "success_rate": 1.0,
+      "p95_ms": 1391.7046,
+      "p99_ms": 1675.2573599999998,
+      "average_ms": 992.7992553948587,
+      "full_hold_completed": true,
+      "passes_latency_and_success_thresholds": false
+    }
+  ],
+  "highest_passing_hold": {
+    "vus": 80,
+    "hold_seconds": 30,
+    "requests": 10687,
+    "http_200": 10687,
+    "requests_per_second": 356.23333333333335,
+    "successful_requests_per_second": 356.23333333333335,
+    "success_rate": 1.0,
+    "p95_ms": 342.64315,
+    "p99_ms": 423.9912819999996,
+    "average_ms": 224.95251209881144,
+    "full_hold_completed": true,
+    "passes_latency_and_success_thresholds": true
+  },
+  "highest_observed_hold": {
+    "vus": 80,
+    "hold_seconds": 30,
+    "requests": 10687,
+    "http_200": 10687,
+    "requests_per_second": 356.23333333333335,
+    "successful_requests_per_second": 356.23333333333335,
+    "success_rate": 1.0,
+    "p95_ms": 342.64315,
+    "p99_ms": 423.9912819999996,
+    "average_ms": 224.95251209881144,
+    "full_hold_completed": true,
+    "passes_latency_and_success_thresholds": true
+  },
+  "requests": 68826,
+  "http_200": 68826,
+  "http_failures": 0,
+  "network_failures": 0,
+  "server_5xx": 0,
+  "request_timeouts": 0,
+  "aggregate_rps_including_ramps_and_completion_tail": 245.3229251683682,
+  "aggregate_latency_ms": {
+    "max": 2024.5374,
+    "p(95)": 1067.47655,
+    "p(99)": 1315.294875,
+    "avg": 346.2638714700838,
+    "min": 47.6684,
+    "med": 201.02245
+  },
+  "final": {
+    "snapshot": {
+      "at_utc": "2026-10-09T15:31:01.467173+00:00",
+      "available_memory_mb": 1559.6,
+      "services": {
+        "job-portal-gateway": {
+          "memory_mib": 314.1,
+          "rss_mib": 336.4,
+          "cpu_stat": {
+            "usage_usec": 104161068,
+            "user_usec": 85764407,
+            "system_usec": 18396660,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 8826,
+            "nr_throttled": 762,
+            "throttled_usec": 54908383,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-application-service": {
+          "memory_mib": 391.7,
+          "rss_mib": 413.4,
+          "cpu_stat": {
+            "usage_usec": 293566514,
+            "user_usec": 203925300,
+            "system_usec": 89641214,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 47221,
+            "nr_throttled": 174,
+            "throttled_usec": 8424679,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "100000 100000"
+        },
+        "job-portal-notification-service": {
+          "memory_mib": 344.3,
+          "rss_mib": 353.0,
+          "cpu_stat": {
+            "usage_usec": 1476127585,
+            "user_usec": 631220111,
+            "system_usec": 844907474,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 711858,
+            "nr_throttled": 537,
+            "throttled_usec": 43657799,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-mailhog": {
+          "memory_mib": 909.9,
+          "rss_mib": 915.0,
+          "cpu_stat": {
+            "usage_usec": 161862035,
+            "user_usec": 108501784,
+            "system_usec": 53360251,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 0,
+            "nr_throttled": 0,
+            "throttled_usec": 0,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "max 100000"
+        },
+        "job-portal-user-service": {
+          "memory_mib": 410.9,
+          "rss_mib": 422.8,
+          "cpu_stat": {
+            "usage_usec": 912415986,
+            "user_usec": 465538352,
+            "system_usec": 446877633,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 634812,
+            "nr_throttled": 882,
+            "throttled_usec": 64789607,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-applicationdb": {
+          "memory_mib": 336.6,
+          "rss_mib": 15.2,
+          "cpu_stat": {
+            "usage_usec": 1944767676,
+            "user_usec": 1143080479,
+            "system_usec": 801687197,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 161415,
+            "nr_throttled": 21228,
+            "throttled_usec": 525652921,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        },
+        "job-portal-userdb": {
+          "memory_mib": 50.5,
+          "rss_mib": 15.0,
+          "cpu_stat": {
+            "usage_usec": 1748188931,
+            "user_usec": 1036867018,
+            "system_usec": 711321912,
+            "nice_usec": 0,
+            "core_sched.force_idle_usec": 0,
+            "nr_periods": 141908,
+            "nr_throttled": 21290,
+            "throttled_usec": 471144611,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "running": true,
+          "oom_killed": false,
+          "cpu_max": "50000 100000"
+        }
+      },
+      "stop_reason": "MailHog RSS above 768 MiB",
+      "mailhog_total": 68826,
+      "kafka": [
+        {
+          "partition": 0,
+          "committed": 373047,
+          "end": 373047,
+          "lag": 0
+        }
+      ],
+      "published_total": 373047,
+      "lag": 0,
+      "database_status_counts": {
+        "PENDING": 29365,
+        "SHORTLISTED": 210605
+      },
+      "vps_k6_running": false
+    },
+    "pipeline": {
+      "new_shortlisted_rows": 68826,
+      "new_kafka_records": 68826,
+      "new_mailhog_messages": 68826,
+      "final_kafka_lag": 0,
+      "count_reconciliation_passed": true,
+      "identity_level_audit_performed": false
+    },
+    "authenticated_loopback_health": "passed",
+    "gateway_restarted_for_recovery": false,
+    "services": {
+      "job-portal-gateway": {
+        "id": "91432e7fc07b1944a30af54dfec74d453ddc026aa2e02ff0e0fc804e72a01bc1",
+        "image": "local/job-portal-gateway:pool10-total50-20261009",
+        "image_id": "sha256:5cf853442886a7a1e4c7b425be1daacf81e821b0cd0693eda2427d2533d97aec",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-09T14:47:47.564529755Z",
+        "memory_limit_bytes": 536870912,
+        "memory_reservation_bytes": 268435456,
+        "cpu_nanocpus": 500000000
+      },
+      "job-portal-application-service": {
+        "id": "161ca3e0af23202ec95239af8b70b33bfd97be45a4b47f2b661454c8d63f9f19",
+        "image": "andyy02/job-portal-application-service@sha256:e8c2ae6d5d20b1e6d254740841fcbb85f3eb421578ebd1b3ddf6e8150b6903c8",
+        "image_id": "sha256:e8c2ae6d5d20b1e6d254740841fcbb85f3eb421578ebd1b3ddf6e8150b6903c8",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-09T10:50:54.615254279Z",
+        "memory_limit_bytes": 1073741824,
+        "memory_reservation_bytes": 536870912,
+        "cpu_nanocpus": 1000000000
+      },
+      "job-portal-notification-service": {
+        "id": "8361e7c02865c5f9393654a3f5478d47d7046a2aab99ddcd4b30e9c757751916",
+        "image": "local/job-portal-notification-service:repair-20261007",
+        "image_id": "sha256:745693d47440b5a77bb850096f3c01901e1008ec205ca961d99ec5bc95e5feeb",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-07T09:06:02.521440686Z",
+        "memory_limit_bytes": 536870912,
+        "memory_reservation_bytes": 268435456,
+        "cpu_nanocpus": 500000000
+      },
+      "job-portal-mailhog": {
+        "id": "6213489419b7312ea858d95932bb71db02acbc02a6c059bb89aa95f2432bd0a3",
+        "image": "mailhog/mailhog:v1.0.1",
+        "image_id": "sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-09T14:49:11.56329355Z",
+        "memory_limit_bytes": 0,
+        "memory_reservation_bytes": 0,
+        "cpu_nanocpus": 0
+      },
+      "job-portal-user-service": {
+        "id": "07485a43a949ce7b3186dd0a9d3000f1f919420ae9162bf005e454cfd83f2a56",
+        "image": "andyy02/job-portal-user-service:latest",
+        "image_id": "sha256:49c285578bb49888a3153d5f31af07eb084eed88b00f646916bde41d90c890b7",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-06T16:48:50.983995516Z",
+        "memory_limit_bytes": 536870912,
+        "memory_reservation_bytes": 268435456,
+        "cpu_nanocpus": 500000000
+      },
+      "job-portal-applicationdb": {
+        "id": "c1f1cae3b2989b22e0df0bf2c5496b7fbddeba243c51cf5aa9a17bd629b666e9",
+        "image": "postgres:16",
+        "image_id": "sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-06T16:36:19.73014274Z",
+        "memory_limit_bytes": 536870912,
+        "memory_reservation_bytes": 268435456,
+        "cpu_nanocpus": 500000000
+      },
+      "job-portal-userdb": {
+        "id": "ffd5632c5076e18812958ab8664d3c3f0026999ed451318fcb175c4240a24e8e",
+        "image": "postgres:16",
+        "image_id": "sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65",
+        "running": true,
+        "oom_killed": false,
+        "restart_count": 0,
+        "started_at": "2026-10-06T16:36:19.735536014Z",
+        "memory_limit_bytes": 536870912,
+        "memory_reservation_bytes": 268435456,
+        "cpu_nanocpus": 500000000
+      }
+    },
+    "private_jwt_removed": true,
+    "vps_k6_running": false,
+    "guard_reason_during_drain": "MailHog RSS above 768 MiB"
+  },
+  "minimum_host_available_memory_mib": 1425.9,
+  "minimum_host_available_memory_during_load_mib": 2056.0,
+  "peak_mailhog_rss_mib": 915.0,
+  "resource_peaks_mib": {
+    "job-portal-gateway": 338.6,
+    "job-portal-application-service": 393.6,
+    "job-portal-notification-service": 345.8,
+    "job-portal-mailhog": 910.0,
+    "job-portal-user-service": 411.6,
+    "job-portal-applicationdb": 348.6,
+    "job-portal-userdb": 53.8
+  },
+  "measurement_method": "Requests tagged by iteration start in each 30-second constant-VU hold, including their response completion tail, divided by 30. Ramp requests excluded. No think time or retries.",
+  "thresholds": {
+    "shortlist_failed": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "shortlist_network_failed": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:10,phase:hold}": {
+      "p(95)<500": {
+        "ok": true
+      },
+      "p(99)<1000": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:40,phase:hold}": {
+      "p(99)<1000": {
+        "ok": true
+      },
+      "p(95)<500": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:10,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:80,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:320,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:80,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:5,phase:hold}": {
+      "p(95)<500": {
+        "ok": true
+      },
+      "p(99)<1000": {
+        "ok": true
+      }
+    },
+    "shortlist_success_duration": {
+      "p(99)<1000": {
+        "ok": false
+      },
+      "p(95)<500": {
+        "ok": false
+      }
+    },
+    "stage_requests{target_vus:5,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "shortlist_success": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:20,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:80,phase:hold}": {
+      "p(95)<500": {
+        "ok": true
+      },
+      "p(99)<1000": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:160,phase:hold}": {
+      "p(99)<1000": {
+        "ok": true
+      },
+      "p(95)<500": {
+        "ok": false
+      }
+    },
+    "stage_latency{target_vus:320,phase:hold}": {
+      "p(95)<500": {
+        "ok": false
+      },
+      "p(99)<1000": {
+        "ok": false
+      }
+    },
+    "shortlist_server_failed": {
+      "count>=0": {
+        "ok": true
+      }
+    },
+    "http_req_duration": {
+      "p(99)<1000": {
+        "ok": false
+      },
+      "p(95)<500": {
+        "ok": false
+      }
+    },
+    "stage_success{target_vus:20,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:5,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:160,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:10,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:40,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_success{target_vus:320,phase:hold}": {
+      "rate>0.999": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:160,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "stage_latency{target_vus:20,phase:hold}": {
+      "p(95)<500": {
+        "ok": true
+      },
+      "p(99)<1000": {
+        "ok": true
+      }
+    },
+    "stage_requests{target_vus:40,phase:hold}": {
+      "count>0": {
+        "ok": true
+      }
+    },
+    "shortlist_accepted": {
+      "count>=0": {
+        "ok": true
+      }
+    }
+  }
+}

@@ -154,11 +154,9 @@ public class RouteConfig {
         String authorities = claims.get("authorities", String.class);
         Long userId = claims.get("userId", Long.class);
 
-        if (request.method() == HttpMethod.PATCH
-                && request.path().matches("/api/companies/[^/]+/(verify|deactivate)")
-                && !hasRole(authorities, "ROLE_ADMIN")) {
+        if (requiresAdmin(request) && !hasRole(authorities, "ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Company verification and deactivation require an admin");
+                    "This operation requires an admin");
         }
 
         return ServerRequest.from(request)
@@ -168,5 +166,30 @@ public class RouteConfig {
                     headers.set("X-User-Role", authorities);
                 })
                 .build();
+    }
+
+    private boolean requiresAdmin(ServerRequest request) {
+        HttpMethod method = request.method();
+        // Use the same parsed path matching as the gateway routes, including path parameters.
+        if (RequestPredicates.path("/api/admin/**").test(request)) {
+            return true;
+        }
+        if ((method == HttpMethod.GET || method == HttpMethod.HEAD)
+                && (RequestPredicates.path("/api/users").test(request)
+                    || RequestPredicates.path("/api/users/").test(request))) {
+            return true;
+        }
+        if ((method == HttpMethod.DELETE && RequestPredicates.path("/api/users/{id}").test(request))
+                || (method == HttpMethod.PATCH
+                    && (RequestPredicates.path("/api/users/{id}/suspend").test(request)
+                        || RequestPredicates.path("/api/users/{id}/activate").test(request)
+                        || RequestPredicates.path("/api/companies/{id}/verify").test(request)
+                        || RequestPredicates.path("/api/companies/{id}/deactivate").test(request)))) {
+            return true;
+        }
+        return method != HttpMethod.GET && method != HttpMethod.HEAD && method != HttpMethod.OPTIONS
+                && (RequestPredicates.path("/api/job-categories/**").test(request)
+                    || RequestPredicates.path("/api/job-skills/**").test(request)
+                    || RequestPredicates.path("/api/job-tags/**").test(request));
     }
 }

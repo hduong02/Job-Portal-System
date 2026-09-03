@@ -81,12 +81,14 @@ const applicationSlice = createSlice({
       })
       .addCase(updateApplicationStatus.fulfilled, (s, { payload }) => {
         s.isActionLoading = false;
-        s.currentApplication = payload;
-        const updated=replaceInList(s.applications, payload);
-        s.applications=updated
-
-        console.log("updated",updated)
-
+        // Status PATCH returns a compact patch; preserve loaded candidate/job data.
+        for (const list of [s.applications, s.myApplications]) {
+          const application = list.find((item) => item.id === payload.id);
+          if (application) Object.assign(application, payload);
+        }
+        if (s.currentApplication?.id === payload.id) {
+          Object.assign(s.currentApplication, payload);
+        }
       })
       .addCase(updateApplicationStatus.rejected, (s, { payload }) => {
         s.isActionLoading = false;

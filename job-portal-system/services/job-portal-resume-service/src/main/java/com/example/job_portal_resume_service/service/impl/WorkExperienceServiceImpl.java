@@ -1,5 +1,7 @@
 package com.example.job_portal_resume_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +55,8 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
 
     @Override
-    public List<WorkExperienceResponse> getWorkExperiences(Long resumeId) {
+    public List<WorkExperienceResponse> getWorkExperiences(Long resumeId, Long candidateId) {
+        resumeService.getOwnedResumeEntity(resumeId, candidateId);
         return workExperienceRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
                 .stream().map(WorkExperienceMapper::toWorkExperienceResponse).toList();
     }
@@ -97,13 +100,13 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
     @Override
     public WorkExperience getWorkExperienceEntity(Long workExperienceId) throws Exception {
         return workExperienceRepository.findById(workExperienceId).orElseThrow(
-                () -> new Exception("work experience not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "work experience not found")
         );
     }
 
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if(!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("resume not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "resume not found");
         }
     }
 }

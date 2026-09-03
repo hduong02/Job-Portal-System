@@ -42,6 +42,10 @@ class LocalConfigurationTest {
                     "--GEMINI_API_KEY=local-config-test-key",
                     "--spring.main.banner-mode=off")) {
                 var environment = context.getEnvironment();
+                assertEquals("never", environment.getProperty("spring.web.error.include-stacktrace"), name);
+                assertEquals("false", environment.getProperty("spring.web.error.include-exception"), name);
+                assertEquals("never", environment.getProperty("spring.web.error.include-message"), name);
+                assertEquals("never", environment.getProperty("spring.web.error.include-binding-errors"), name);
                 assertEquals(entry.getValue(), environment.getProperty("server.port", Integer.class), name);
                 assertEquals("http://localhost:8761/eureka/",
                         environment.getProperty("eureka.client.service-url.defaultZone"), name);

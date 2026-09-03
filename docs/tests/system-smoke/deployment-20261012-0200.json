@@ -1,0 +1,68 @@
+[
+  {
+    "container": "job-portal-discovery",
+    "image": "andyy02/job-portal-service-registry:rebuild-20261012-0200",
+    "imageId": "sha256:d578a585b0c391c163787569b38c3d1bab86eff87bfd04ac5c7e7766cb0b43b8",
+    "backup": "job-portal-discovery-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-config-server",
+    "image": "andyy02/job-portal-config-server:rebuild-20261012-0200",
+    "imageId": "sha256:3b655348ee53c90239bcf1edece620aa70699c192d3d6d0dfadb5982fb26621d",
+    "backup": "job-portal-config-server-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-user-service",
+    "image": "andyy02/job-portal-user-service:rebuild-20261012-0200",
+    "imageId": "sha256:100f0372087d4cd076d0ae36bb4fec7e18192569c2e6d5c1b8847817c961e313",
+    "backup": "job-portal-user-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-company-service",
+    "image": "andyy02/job-portal-company-service:rebuild-20261012-0200",
+    "imageId": "sha256:c4c970553cebfefa27a3c04215d3251fa941ac0448f284d5584221be586c3cb9",
+    "backup": "job-portal-company-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-job-service",
+    "image": "andyy02/job-portal-job-service:rebuild-20261012-0200",
+    "imageId": "sha256:504f3d0b2fbd3c40c05da9f0f0e64f783f67be5d842a16ed74e09ca9d55cb4c4",
+    "backup": "job-portal-job-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-resume-service",
+    "image": "andyy02/job-portal-resume-service:rebuild-20261012-0200",
+    "imageId": "sha256:e7a5e73404e10d2c2b6009f453713d2fef682002627dc79cedaf5d6d89664b8f",
+    "backup": "job-portal-resume-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-application-service",
+    "image": "andyy02/job-portal-application-service:screening-fix-20261012-1535",
+    "imageId": "sha256:df0ee50a449aeceeb7f051a6fc59e78784bdf8315729914ca8338216bfaf5e0e",
+    "backup": "job-portal-application-service-before-screening-fix-20261012-1535"
+  },
+  {
+    "container": "job-portal-preference-service",
+    "image": "andyy02/job-portal-preference-service:rebuild-20261012-0200",
+    "imageId": "sha256:765a2bc570dd8725a6dc10149436f83b30fc59e30b49856d3eb1733c3fca8492",
+    "backup": "job-portal-preference-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-ai-service",
+    "image": "andyy02/job-portal-ai-service:rebuild-20261012-0200",
+    "imageId": "sha256:e7171fba0aad0b70faacdcdf1f52c9e7b618eb01c9319e6fa0bee888bd4fa48a",
+    "backup": "job-portal-ai-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-notification-service",
+    "image": "andyy02/job-portal-notification-service:rebuild-20261012-0200",
+    "imageId": "sha256:fa5b7753b1a1f8aec09ba86fe4706e17e283076aeb7231d8701433fc519a1b13",
+    "backup": "job-portal-notification-service-before-rebuild-20261012-0200"
+  },
+  {
+    "container": "job-portal-gateway",
+    "image": "andyy02/job-portal-api-gateway:rebuild-20261012-0200",
+    "imageId": "sha256:1022e20f62bfd52d7ca85efc75ec3106434f9acf585aa926d71e31a8c234c9a4",
+    "backup": "job-portal-gateway-before-rebuild-20261012-0200"
+  }
+]

@@ -1,5 +1,7 @@
 package com.example.job_portal_application_service.service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.example.domain.ApplicationStatus;
 import com.example.job_portal_application_service.event.ApplicationStatusChange;
 import com.example.job_portal_application_service.repository.ApplicationRepository;
@@ -17,12 +19,12 @@ public class ApplicationStatusUpdater {
     public ApplicationStatusChange updateStatus(Long applicationId, Long employerId,
             ApplicationStatus status) throws Exception {
         var application = applications.findById(applicationId)
-                .orElseThrow(() -> new Exception("Application not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
         if (!application.getEmployerId().equals(employerId)) {
-            throw new Exception("You are not the employer for this application");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the employer for this application");
         }
         if (application.getStatus() == ApplicationStatus.WITHDRAWN) {
-            throw new Exception("Candidate have already withdrawn");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Candidate have already withdrawn");
         }
         var oldStatus = application.getStatus();
         application.setStatus(status);

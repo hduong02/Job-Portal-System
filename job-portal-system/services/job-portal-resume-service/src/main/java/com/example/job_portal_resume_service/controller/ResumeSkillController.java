@@ -30,8 +30,9 @@ public class ResumeSkillController {
 
     @GetMapping
     public ResponseEntity<List<ResumeSkillResponse>> getSkills(
-            @PathVariable Long resumeId) {
-        return ResponseEntity.ok(resumeSkillService.getSkills(resumeId));
+            @PathVariable Long resumeId,
+            @RequestHeader("X-User-Id") Long candidateId) {
+        return ResponseEntity.ok(resumeSkillService.getSkills(resumeId, candidateId));
     }
 
     @PutMapping("/{skillId}")

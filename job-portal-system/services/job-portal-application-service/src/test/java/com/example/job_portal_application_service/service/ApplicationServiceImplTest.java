@@ -43,6 +43,28 @@ class ApplicationServiceImplTest {
             screenings, jobs, resumes, companies, users);
 
     @Test
+    void duplicateApplicationReturnsConflictBeforeDoingRemoteWork() {
+        when(applications.existsByCandidateIdAndJobId(2L, 5L)).thenReturn(true);
+        var request = CreateApplicationRequest.builder().jobId(5L).resumeId(7L).build();
+        assertEquals(HttpStatus.CONFLICT, assertThrows(ResponseStatusException.class,
+                () -> service.createApplication(2L, request)).getStatusCode());
+        verifyNoInteractions(jobs, resumes, publisher);
+        verify(applications, never()).save(any());
+    }
+
+    @Test
+    void unrelatedCandidateCannotWithdrawOrDelete() {
+        when(applications.findById(1L)).thenReturn(Optional.of(
+                Application.builder().id(1L).candidateId(2L).employerId(3L).build()));
+        assertEquals(HttpStatus.FORBIDDEN, assertThrows(ResponseStatusException.class,
+                () -> service.withdraw(1L, 4L, null)).getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, assertThrows(ResponseStatusException.class,
+                () -> service.deleteApplication(1L, 4L)).getStatusCode());
+        verify(applications, never()).save(any());
+        verify(applications, never()).delete(any(Application.class));
+    }
+
+    @Test
     void rejectsJobsThatAreNotAcceptingApplications() {
         JobResponse[] unavailableJobs = {
                 JobResponse.builder().status(JobStatus.DRAFT).active(true).build(),

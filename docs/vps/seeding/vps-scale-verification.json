@@ -1,0 +1,91 @@
+{
+  "database_counts": {
+    "users": 10000,
+    "companies": 2000,
+    "jobs": 50000,
+    "applications": 50000,
+    "resumes": 8000
+  },
+  "api_reads": [
+    {
+      "url": "http://127.0.0.1:5002/api/companies/1051",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies/1051",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies/50501",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies/50501",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies/99951",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies/99951",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5002/api/companies?page=0&size=10",
+      "status": 200,
+      "totalElements": 2000
+    },
+    {
+      "url": "http://127.0.0.1:5000/api/companies/1051",
+      "status": 401,
+      "expected": "Authentication required"
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/5051",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/5051",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/1252501",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/1252501",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/2499951",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs/2499951",
+      "attempt": 2,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5003/api/jobs?page=0&size=10",
+      "status": 200,
+      "totalElements": 49990
+    },
+    {
+      "url": "http://127.0.0.1:5000/api/jobs/5051",
+      "status": 401,
+      "expected": "Authentication required"
+    }
+  ]
+}

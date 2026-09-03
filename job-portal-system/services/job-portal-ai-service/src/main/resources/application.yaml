@@ -2,6 +2,12 @@ server:
   port: ${SERVER_PORT:6000}
 
 spring:
+  web:
+    error:
+      include-stacktrace: never
+      include-exception: false
+      include-message: never
+      include-binding-errors: never
   application:
     name: job-portal-ai-service
 

@@ -2,6 +2,8 @@ package com.example.job_portal_resume_service.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,9 +67,17 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public ResumeResponse getResumeById(Long resumeId, Long candidateId)
             throws Exception {
-        Resume resume = getResumeEntity(resumeId);
-        assertOwner(resume, candidateId);
+        Resume resume = getOwnedResumeEntity(resumeId, candidateId);
         return buildFullResponse(resume);
+    }
+
+    @Override
+    public Resume getOwnedResumeEntity(Long resumeId, Long candidateId) {
+        // Use the same rejection for missing, deleted, and inaccessible resumes.
+        return resumeRepository.findById(resumeId)
+                .filter(resume -> Boolean.TRUE.equals(resume.getIsActive()))
+                .filter(resume -> candidateId != null && candidateId.equals(resume.getCandidateId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
     }
 
 
@@ -157,7 +167,7 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public Resume getResumeEntity(Long resumeId) throws Exception {
         return resumeRepository.findById(resumeId).orElseThrow(
-                () -> new Exception("resume not found with id "+resumeId)
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "resume not found with id "+resumeId)
         );
     }
 
@@ -200,7 +210,7 @@ public class ResumeServiceImpl implements ResumeService {
 
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if (!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("resume not found with id");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "resume not found with id");
         }
     }
 }

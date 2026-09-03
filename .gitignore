@@ -5,5 +5,8 @@
 # IDE
 .vscode/
 
+# Private load-test runtime, authentication, portable tools, and raw output
+.loadtest/
+
 # Centralized config repository (cloned separately)
 job-portal-config/

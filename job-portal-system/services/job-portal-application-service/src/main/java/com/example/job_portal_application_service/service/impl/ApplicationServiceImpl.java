@@ -60,7 +60,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         if (applicationRepository.existsByCandidateIdAndJobId(
                 candidateId, req.getJobId())) {
-            throw new Exception("You have already applied");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You have already applied");
         }
 
         JobResponse job = jobClient.getJobById(req.getJobId());
@@ -194,7 +194,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public Application getApplicationEntity(Long id) throws Exception {
         return applicationRepository.findById(id).orElseThrow(
-                () -> new Exception("Application not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found")
         );
     }
 
@@ -223,13 +223,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     
     private void assertCandidate(Application application, Long candidateId) throws Exception {
         if (!application.getCandidateId().equals(candidateId)) {
-            throw new Exception("You are not the owner of this application");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this application");
         }
     }
 
     private void assertEmployer(Application application, Long employerId) throws Exception {
         if (!application.getEmployerId().equals(employerId)) {
-            throw new Exception("You are not the employer for this application");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the employer for this application");
         }
     }
 

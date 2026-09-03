@@ -1,0 +1,55 @@
+{
+  "company_name": "Shortlist Load Test 2026-10-07",
+  "company_id": 100001,
+  "employer_id": 6,
+  "jobs": 30,
+  "candidates": 7999,
+  "applications": 239970,
+  "new_resumes": 1,
+  "counts": {
+    "users": 10001,
+    "companies": 2001,
+    "jobs": 50030,
+    "resumes": 8001,
+    "applications": 289970
+  },
+  "api_checks": [
+    {
+      "resource": "company",
+      "id": 100001,
+      "status": 200
+    },
+    {
+      "resource": "job",
+      "id": 2500001,
+      "status": 200
+    },
+    {
+      "resource": "job",
+      "id": 2500751,
+      "status": 200
+    },
+    {
+      "resource": "job",
+      "id": 2501451,
+      "status": 200
+    },
+    {
+      "resource": "application",
+      "id": 50001,
+      "status": 200
+    },
+    {
+      "resource": "application",
+      "id": 50002,
+      "status": 200
+    },
+    {
+      "resource": "application",
+      "id": 50003,
+      "status": 200
+    }
+  ],
+  "manifest": "/root/job-portal-shortlist-loadtest-20261007/manifest.json",
+  "application_csv": "/root/job-portal-shortlist-loadtest-20261007/applications.csv"
+}

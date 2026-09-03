@@ -1,5 +1,7 @@
 package com.example.job_portal_resume_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,8 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public List<LanguageResponse> getLanguages(Long resumeId) {
+    public List<LanguageResponse> getLanguages(Long resumeId, Long candidateId) {
+        resumeService.getOwnedResumeEntity(resumeId, candidateId);
         return languageRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
                 .stream().map(ResumeMapper::toLanguageResponse).toList();
     }
@@ -55,7 +58,7 @@ public class LanguageServiceImpl implements LanguageService {
             Long candidateId,
             AddLanguageRequest req) throws Exception {
         Language lang = languageRepository.findById(languageId).orElseThrow(
-                () -> new Exception("Language not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Language not found")
         );
         assertOwner(lang.getResume(), candidateId);
         lang.setLanguageName(req.getLanguageName());
@@ -72,7 +75,7 @@ public class LanguageServiceImpl implements LanguageService {
             Long resumeId,
             Long candidateId) throws Exception {
         Language lang = languageRepository.findById(languageId).orElseThrow(
-                () -> new Exception("Language not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Language not found")
         );
         assertOwner(lang.getResume(), candidateId);
         languageRepository.delete(lang);
@@ -80,7 +83,7 @@ public class LanguageServiceImpl implements LanguageService {
 
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if (!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("Resume not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
         }
     }
 }

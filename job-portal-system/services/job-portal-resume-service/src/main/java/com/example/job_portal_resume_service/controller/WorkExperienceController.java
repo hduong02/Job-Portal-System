@@ -30,8 +30,9 @@ public class WorkExperienceController {
 
     @GetMapping
     public ResponseEntity<List<WorkExperienceResponse>> getWorkExperiences(
-            @PathVariable Long resumeId) throws Exception {
-        return ResponseEntity.ok(workExperienceService.getWorkExperiences(resumeId));
+            @PathVariable Long resumeId,
+            @RequestHeader("X-User-Id") Long candidateId) {
+        return ResponseEntity.ok(workExperienceService.getWorkExperiences(resumeId, candidateId));
     }
 
     @PutMapping("/{experienceId}")

@@ -2,6 +2,12 @@ server:
   port: ${SERVER_PORT:5003}
 
 spring:
+  web:
+    error:
+      include-stacktrace: never
+      include-exception: false
+      include-message: never
+      include-binding-errors: never
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_portal_job}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}

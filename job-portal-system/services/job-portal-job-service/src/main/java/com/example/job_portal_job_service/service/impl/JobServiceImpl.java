@@ -1,5 +1,7 @@
 package com.example.job_portal_job_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,7 +90,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse getJobById(Long id) throws Exception {
         Job job = jobRepository.findById(id).orElseThrow(
-                () -> new Exception("Job not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found")
         );
         return convertToResponse(job);
     }
@@ -108,7 +110,7 @@ public class JobServiceImpl implements JobService {
     public JobResponse updateJob(Long jobId, Long employerId, JobRequest req)
             throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found")
         );
 
         assertEmployer(job, employerId);
@@ -145,11 +147,11 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse publishJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found")
         );
         assertEmployer(job, employerId);
         if (job.getStatus() == JobStatus.CLOSED || job.getStatus() == JobStatus.EXPIRED) {
-            throw new Exception("Job is expired");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Job is expired");
         }
         job.setStatus(JobStatus.OPEN);
         job.setPublishedAt(LocalDateTime.now());
@@ -160,7 +162,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse closeJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found")
         );
         assertEmployer(job, employerId);
 
@@ -173,7 +175,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void deleteJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found")
         );
         assertEmployer(job, employerId);
         jobRepository.delete(job);
@@ -210,7 +212,7 @@ public class JobServiceImpl implements JobService {
 
     private void assertEmployer(Job job, Long employerId) throws Exception {
         if (!job.getEmployerId().equals(employerId)) {
-            throw new Exception("You are not the employer who posted this job");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the employer who posted this job");
         }
     }
 }

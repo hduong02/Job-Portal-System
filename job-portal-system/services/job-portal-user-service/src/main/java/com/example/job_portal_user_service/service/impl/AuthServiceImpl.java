@@ -5,6 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -38,11 +39,11 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse signup(SignupRequest req) throws Exception {
 
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new Exception("Email Already registered : " + req.getEmail());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
 
         if (req.getRole() == UserRole.ROLE_ADMIN) {
-            throw new Exception("cannot self-register as role admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot self-register as admin");
         }
 
         User user = User.builder()
@@ -102,14 +103,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private Authentication authenticate(String email, String password) throws Exception {
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+        UserDetails userDetails;
+        try {
+            userDetails = customUserDetailsService.loadUserByUsername(email);
+        } catch (UsernameNotFoundException error) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
 
         if (userDetails == null) {
-            throw new Exception("user not found with email " + email);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
         if (!passwordEncoder.matches(password, userDetails.getPassword())){
-            throw new Exception("Invalid password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
         return new UsernamePasswordAuthenticationToken(

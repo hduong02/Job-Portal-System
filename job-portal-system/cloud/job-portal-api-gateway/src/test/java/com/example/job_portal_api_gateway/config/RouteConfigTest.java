@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.function.ServerRequest;
@@ -27,13 +26,10 @@ class RouteConfigTest {
     void nonAdminCannotVerifyCompany() {
         JwtUtil jwt = mock(JwtUtil.class);
         RouteConfig routes = new RouteConfig(jwt);
-        ServerRequest request = mock(ServerRequest.class);
-        ServerRequest.Headers headers = mock(ServerRequest.Headers.class);
-        when(request.headers()).thenReturn(headers);
-        when(headers.firstHeader(JwtConstant.JWT_HEADER))
-                .thenReturn(JwtConstant.TOKEN_PREFIX + "token");
-        when(request.method()).thenReturn(HttpMethod.PATCH);
-        when(request.path()).thenReturn("/api/companies/1/verify");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest(
+                "PATCH", "/api/companies/1/verify");
+        servletRequest.addHeader(JwtConstant.JWT_HEADER, JwtConstant.TOKEN_PREFIX + "token");
+        ServerRequest request = ServerRequest.create(servletRequest, List.of());
         Claims claims = mock(Claims.class);
         when(jwt.extractAllClaims("token")).thenReturn(claims);
         when(claims.get("authorities", String.class)).thenReturn("ROLE_EMPLOYER");

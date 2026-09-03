@@ -207,7 +207,7 @@ services:
       - job-portal-net
 
   gateway:
-    image: andyy02/job-portal-api-gateway:latest
+    image: andyy02/job-portal-api-gateway@sha256:f5447bda6b6de0f69acefda73cfd9d6eea7604811f4e30fff26372d761dafbfe
     container_name: job-portal-gateway
     mem_limit: 512m
     mem_reservation: 256m
@@ -347,9 +347,9 @@ services:
   application-service:
     image: andyy02/job-portal-application-service:latest
     container_name: job-portal-application-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
     ports:
       - "5005:5005"
     depends_on:

@@ -52,6 +52,10 @@ public class ApplicationMapper {
                 .job(job)
                 .company(company)
                 .status(application.getStatus())
+                // Screening can commit after the application entity was loaded.
+                // Use the same completed result for both top-level and nested AI fields.
+                .aiScore(screening != null ? screening.getOverallScore() : application.getAiScore())
+                .aiShortListStatus(screening != null ? screening.getShortListStatus() : application.getAiShortListStatus())
 
                 .resumeId(application.getResumeId())
                 .coverLetter(application.getCoverLetter())

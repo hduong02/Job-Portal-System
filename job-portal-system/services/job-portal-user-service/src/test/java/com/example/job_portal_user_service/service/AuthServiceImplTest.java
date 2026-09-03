@@ -61,6 +61,24 @@ class AuthServiceImplTest {
     }
 
     @Test
+    void badCredentialsReturnUnauthorizedWithoutIssuingToken() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("candidate@example.com");
+        request.setPassword("wrong");
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(request.getEmail()).password("encoded").roles("USER").build();
+        when(details.loadUserByUsername(request.getEmail())).thenReturn(userDetails);
+        assertEquals(HttpStatus.UNAUTHORIZED, assertThrows(ResponseStatusException.class,
+                () -> service.login(request)).getStatusCode());
+        when(details.loadUserByUsername(request.getEmail())).thenThrow(
+                new org.springframework.security.core.userdetails.UsernameNotFoundException("missing"));
+        assertEquals(HttpStatus.UNAUTHORIZED, assertThrows(ResponseStatusException.class,
+                () -> service.login(request)).getStatusCode());
+        verifyNoInteractions(jwt);
+        verify(users, never()).save(any());
+    }
+
+    @Test
     void activeAccountCanLogIn() throws Exception {
         LoginRequest request = new LoginRequest();
         request.setEmail("candidate@example.com");

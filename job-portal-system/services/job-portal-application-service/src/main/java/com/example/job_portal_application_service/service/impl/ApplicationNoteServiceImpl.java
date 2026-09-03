@@ -1,5 +1,7 @@
 package com.example.job_portal_application_service.service.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -59,14 +61,14 @@ public class ApplicationNoteServiceImpl implements ApplicationNoteService{
         assertEmployer(application, employerId);
 
         ApplicationNote note = applicationNoteRepository.findById(noteId).orElseThrow(
-                ()-> new Exception("not does not belong to application")
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "not does not belong to application")
         );
         applicationNoteRepository.delete(note);
     }
 
     private void assertEmployer(Application application, Long employerId) throws Exception {
         if (!application.getEmployerId().equals(employerId)) {
-            throw new Exception("you are not the employer for this application");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you are not the employer for this application");
         }
     }
 

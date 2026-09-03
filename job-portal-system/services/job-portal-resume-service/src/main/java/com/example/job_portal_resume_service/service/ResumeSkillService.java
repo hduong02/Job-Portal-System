@@ -12,7 +12,7 @@ public interface ResumeSkillService {
             Long candidateId,
             AddResumeSkillRequest req) throws Exception;
 
-    List<ResumeSkillResponse> getSkills(Long resumeId);
+    List<ResumeSkillResponse> getSkills(Long resumeId, Long candidateId);
 
     ResumeSkillResponse updateSkill(
             Long skillId,

@@ -13,7 +13,7 @@ public interface WorkExperienceService {
             Long candidateId,
             AddWorkExperienceRequest req) throws Exception;
 
-    List<WorkExperienceResponse> getWorkExperiences(Long resumeId);
+    List<WorkExperienceResponse> getWorkExperiences(Long resumeId, Long candidateId);
 
     WorkExperienceResponse updateWorkExperience(
             Long resumeId,

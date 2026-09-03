@@ -14,7 +14,7 @@ public interface EducationService {
             Long candidateId,
             AddEducationRequest request) throws Exception;
 
-    List<EducationResponse> getEducations(Long resumeId);
+    List<EducationResponse> getEducations(Long resumeId, Long candidateId);
 
     EducationResponse updateEducation(
             Long educationId,
