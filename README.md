@@ -60,7 +60,8 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 
 ![Job Portal system architecture](docs/architecture/architecture.png)
 
-Text version for terminal readers:
+<details>
+<summary>Text architecture diagram</summary>
 
 ```text
                     ┌──────────────────────────────────────────┐
@@ -100,6 +101,8 @@ Text version for terminal readers:
                     │ Per-service databases · Redis Cache      │
                     └──────────────────────────────────────────┘
 ```
+
+</details>
 
 ---
 
@@ -182,84 +185,19 @@ AI shortlist categories are derived from the overall score: `AUTO_SHORTLISTED` (
 
 ## Technology Stack
 
-### Backend Framework
-
-| Technology | Version | Purpose |
+| Layer | Technologies | Purpose |
 |---|---|---|
-| Spring Boot | 4.1.1 | Base application framework |
-| Spring Cloud | 2025.1.2 | Config, Eureka, Gateway, OpenFeign |
-| Spring Data JPA | managed | ORM, repositories, and Criteria API queries |
-| Spring Security | managed | Authentication, password hashing, user-service authorization |
-| Spring Kafka | managed | Kafka producer/consumer integration |
-| Spring Mail | managed | JavaMailSender and HTML email delivery |
-| Google Gen AI Java SDK | 1.68.0 | Gemini integration |
+| Backend | Java, Spring Boot, Spring Data JPA | Microservices, persistence, and dynamic queries |
+| Service infrastructure | Spring Cloud Gateway, Eureka, Config, OpenFeign, LoadBalancer | Routing, discovery, configuration, and inter-service calls |
+| Data | PostgreSQL, Redis | Per-service databases and cached job/company lookups |
+| Security | Spring Security, JJWT, BCrypt | Authentication, JWT validation, and password hashing |
+| Messaging & email | Apache Kafka, Spring Mail, MailHog | Status-change events and HTML email delivery |
+| AI | Google Gemini, Google Gen AI Java SDK | Content generation, skills analysis, and candidate screening |
+| Frontend | React, Vite, Tailwind CSS, Redux Toolkit, React Router | UI, styling, state, and navigation |
+| UI utilities | Axios, React Hook Form, Zod, shadcn, Radix UI, Base UI, Recharts | API requests, forms, validation, components, and charts |
+| Build & testing | Maven, Jib, Docker Compose, pnpm, Node.js, k6 | Builds, containers, dependency management, and system tests |
 
-### Infrastructure
-
-| Technology | Version | Purpose |
-|---|---|---|
-| Apache Kafka | 4.3.1 | Async event streaming (KRaft — no Zookeeper) |
-| PostgreSQL | 16 (Compose) | Primary relational databases |
-| Redis | 7-alpine (Compose) | Company and job caching |
-| Eureka Server | Spring Cloud | Service discovery and registration |
-| Spring Cloud Config | Spring Cloud | Git-backed centralized configuration |
-| Spring Cloud Gateway | Spring Cloud | API gateway with WebMVC routing |
-
-### Inter-Service Communication
-
-| Technology | Purpose |
-|---|---|
-| OpenFeign | Declarative HTTP clients for service-to-service calls |
-| Spring Cloud LoadBalancer | Resolve registered service instances |
-
-### Security
-
-| Technology | Purpose |
-|---|---|
-| JJWT (0.13.0) | JWT creation, parsing, and validation |
-| BCrypt | Password hashing |
-| Spring Security | User-service security configuration |
-| Gateway filters and service ownership checks | Protect routes and access to owned resources |
-
-### AI Assistance
-
-| Technology | Purpose |
-|---|---|
-| Google Gemini | Resume summaries, experience bullets, job descriptions, skill suggestions, cover letters, search enhancement, skills gaps, candidate scoring |
-
-The local AI configuration selects `gemini-3.5-flash-lite`; availability depends on the supplied API key and provider account.
-
-### Notifications
-
-| Technology | Purpose |
-|---|---|
-| MailHog (SMTP 1025, web UI 8025) | Default local email capture |
-| JavaMailSender / MimeMessageHelper | HTML emails built in `EmailNotificationService` |
-
-### Frontend
-
-| Technology | Version | Purpose |
-|---|---|---|
-| React | 19.2.8 | Candidate, employer, and administrator interfaces |
-| Vite | 8.3.0 | Development server and frontend build |
-| Tailwind CSS | 4.3.3 | Styling |
-| Redux Toolkit | 2.12.0 | Application state and API workflows |
-| React Router | 7.18.4 | Role-specific navigation |
-| Axios | 1.20.0 | HTTP requests to the gateway |
-| React Hook Form / Zod | 7.88.0 / 4.6.5 | Form handling and validation |
-| shadcn / Radix UI / Base UI | package-managed | UI components |
-| Recharts | 3.10.1 | Dashboard charts |
-
-### Build & Deployment
-
-| Tool | Purpose |
-|---|---|
-| Maven (multi-module) | Backend build and dependency management |
-| Google Jib | Build service Docker images through Maven |
-| Docker Compose | Full stack and local development infrastructure |
-| pnpm | Frontend dependency management (lockfile included) |
-| Lombok | Compile-time boilerplate generation |
-| Node.js / k6 | Whole-system API smoke suite / shortlist stress test |
+Dependency versions are defined in the [backend POM](job-portal-system/pom.xml), [frontend manifest](job-portal-frontend/package.json), and [Compose file](docker/docker-compose.yml).
 
 ---
 
@@ -348,102 +286,19 @@ Tokens currently expire after 10 days. Signing and validation use `JwtConstant.S
 
 ## API Reference
 
-### Auth — `POST /auth/signup`
+Send `Authorization: Bearer <token>` for protected endpoints.
 
-```json
-{
-  "fullName": "John Smith",
-  "email": "john@example.com",
-  "password": "secret123",
-  "phone": "+84901234567",
-  "role": "ROLE_JOB_SEEKER"
-}
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/auth/signup` | Register a job seeker or employer |
+| POST | `/auth/login` | Obtain a JWT |
+| GET | `/api/jobs` | Search jobs with filters and pagination |
+| POST | `/api/resumes` | Create a resume |
+| POST | `/api/applications` | Apply for a job using an owned resume |
+| GET | `/api/applications/my` | List your applications |
+| PATCH | `/api/applications/{id}/status` | Update hiring status and trigger an email notification |
 
-**Returns:** `AuthResponse` containing `title`, `message`, `jwt`, and `user`. Log in with `POST /auth/login` and `{ "email": "john@example.com", "password": "secret123" }`.
-
-### Job Search — `GET /api/jobs`
-
-```text
-?keyword=Java
-&status=OPEN
-&location=Bangkok          (optional)
-&categoryId=1              (optional)
-&skillIds=1,2              (optional)
-&tagIds=1,2                (optional)
-&companyId=1               (optional)
-&minSalary=1000            (optional)
-&maxSalary=5000            (optional)
-&jobType=FULL_TIME         (optional)
-&workMode=REMOTE           (optional)
-&experienceLevel=MID_LEVEL       (optional)
-&minOpenings=1             (optional)
-&sortBy=createdAt
-&sortDirection=DESC
-&page=0&size=20
-```
-
-Send a bearer token for this and all protected endpoints.
-
-### Create Resume — `POST /api/resumes`
-
-```json
-{
-  "title": "Java Developer Resume",
-  "template": "CLASSIC",
-  "visibility": "PRIVATE",
-  "isDefault": true
-}
-```
-
-**Returns:** `ResumeResponse`; use its `id` when applying.
-
-### Create Application — `POST /api/applications`
-
-```json
-{
-  "jobId": 101,
-  "resumeId": 5,
-  "coverLetter": "I am interested in this Java developer position.",
-  "expectedSalary": 3000,
-  "availableFrom": "2026-11-01"
-}
-```
-
-**Returns:** `ApplicationResponse` with status `PENDING`. AI screening runs asynchronously, so scores may not be available in the initial response. The selected job must be open and accepting applications, and the resume must belong to the candidate.
-
-### Update Application Status — `PATCH /api/applications/{id}/status`
-
-```json
-{"status":"SHORTLISTED"}
-```
-
-The owning employer updates the status. The service publishes a Kafka event for email notification. Candidates can retrieve their applications with `GET /api/applications/my`.
-
-### Common Response Shapes
-
-**Paginated list:**
-
-```json
-{
-  "content": [],
-  "totalElements": 0,
-  "totalPages": 0,
-  "number": 0,
-  "size": 20
-}
-```
-
-Controllers return Spring Data `Page` objects; additional pagination metadata may be present.
-
-**Operation result (`ApiResponse`):**
-
-```json
-{
-  "message": "Application deleted successfully",
-  "status": true
-}
-```
+See the [API examples](docs/api/README.md) for request payloads, search parameters, and response shapes. See [Security](#security) for gateway access rules.
 
 ---
 
@@ -455,46 +310,35 @@ Controllers return Spring Data `Page` objects; additional pagination metadata ma
 - Maven 3.9+
 - Docker + Docker Compose
 - Node.js compatible with Vite 8 and pnpm
-- Git
 - A Gemini API key for AI features
-- Node.js 22+ or Docker for the smoke suite; k6 for stress testing
 
 ### Quick Start (Docker Compose)
 
 Run from the repository root in PowerShell:
 
 ```powershell
-# 1. Clone the repository
-git clone <repo-url>
-cd <repo-directory>
-
-# 2. Create docker/.env with a database password and Gemini API key
+# Create docker/.env with a database password and Gemini API key
 Set-Content -Path docker/.env -Value @('DB_PASSWORD=replace-with-your-local-password', 'GEMINI_API_KEY=your-gemini-api-key')
 
-# 3. Build and install the backend modules
+# Build and install the backend modules
 mvn -f job-portal-system/pom.xml clean install -DskipTests
 
-# 4. Build the configured andyy02/job-portal-*:latest images locally
-# Docker must be running. Build only executable services with Jib.
+# Build local service images (Docker must be running)
 mvn -f job-portal-system/pom.xml -pl cloud/job-portal-config-server,cloud/job-portal-service-registry,cloud/job-portal-api-gateway,services/job-portal-user-service,services/job-portal-company-service,services/job-portal-job-service,services/job-portal-resume-service,services/job-portal-application-service,services/job-portal-preference-service,services/job-portal-ai-service,services/job-portal-notification-service compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -Djib.from.image=eclipse-temurin:25-jre -DskipTests
 
-# 5. Start the stack with the locally built gateway image
+# Start the stack with local images
 docker compose --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.local.yml up -d
 docker compose --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.local.yml ps
 ```
 
-Compose forwards `GEMINI_API_KEY` from `docker/.env` to the AI container when started with `--env-file docker/.env`. The Config Server must also be able to access its configured Git repository.
+The Config Server needs access to its configured Git repository. Building JARs alone does not update Docker images; include both Compose files in subsequent commands to use local images.
 
-Compose runs Docker images; building JARs alone does not update those images. The base Compose file pins the gateway to a published digest. The local override selects the `:latest` gateway image built in step 4 and prevents Compose from pulling a replacement. Include both Compose files in subsequent commands when using local images.
-
-To use published images, skip steps 3–4 and omit the local override:
+To use published images, skip the Maven commands and omit the local override:
 
 ```powershell
 docker compose --env-file docker/.env -f docker/docker-compose.yml pull
 docker compose --env-file docker/.env -f docker/docker-compose.yml up -d
 ```
-
-The configured image tags and gateway digest must be available in the registry.
 
 The API is available at [http://localhost:5000](http://localhost:5000), Eureka at [http://localhost:8761](http://localhost:8761), and captured email at [http://localhost:8025](http://localhost:8025). Compose does not include the frontend.
 
@@ -524,11 +368,11 @@ pnpm install
 pnpm dev
 ```
 
-The development Compose file supplies Kafka, Redis, and MailHog only. Provide PostgreSQL separately and create `job_portal_user`, `job_portal_company`, `job_portal_job`, `job_portal_resume`, `job_portal_application`, and `job_portal_preference`. Local datasource defaults use `localhost:5432`, username `postgres`, and password `admin`; set `DB_PASSWORD` to your local password. Override `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, or `SPRING_DATASOURCE_PASSWORD` when needed. Start all services needed by a workflow, including AI for screening.
+The development Compose file provides Kafka, Redis, and MailHog. Run PostgreSQL separately and create `job_portal_user`, `job_portal_company`, `job_portal_job`, `job_portal_resume`, `job_portal_application`, and `job_portal_preference`. Datasource defaults are `localhost:5432`, user `postgres`, password `admin`; set `DB_PASSWORD` to your local password. Start all services needed by your workflow, including AI for screening.
 
-Config Server is optional for local development. To use centralized configuration, omit `SPRING_CLOUD_CONFIG_ENABLED=false` and start `job-portal-config-server` in another terminal. Local Java processes do not automatically load `docker/.env`; set their environment variables in the terminal.
+Local Java processes do not load `docker/.env`; set environment variables in each terminal. To use Config Server, start it separately and omit `SPRING_CLOUD_CONFIG_ENABLED=false`.
 
-The frontend normally runs at [http://localhost:5173](http://localhost:5173). Its API URL defaults to `http://localhost:5000`. To use another gateway, copy `job-portal-frontend/.env.example` to `job-portal-frontend/.env.local` and set `VITE_API_URL` to the gateway's base URL, such as `https://api.example.com`. Restart the dev server after changing it. For deployment, set `VITE_API_URL` before running `pnpm build`; Vite includes the value in the built frontend.
+The frontend runs at [http://localhost:5173](http://localhost:5173) and defaults to gateway `http://localhost:5000`. For another gateway, copy `job-portal-frontend/.env.example` to `.env.local`, set `VITE_API_URL`, and restart the dev server. Set it before `pnpm build` for deployment.
 
 ### Environment Variables
 
@@ -554,7 +398,7 @@ MAIL_PORT=1025
 MAIL_FROM=no-reply@job-portal.local
 ```
 
-The full Compose stack overrides notification SMTP settings directly to use `mailhog:1025`. To change the container sender, update `APP_MAIL_FROM` in Compose or provide an override file. For an external SMTP provider, configure Spring Mail host, port, credentials, authentication, and TLS settings.
+Compose uses SMTP `mailhog:1025`; set `APP_MAIL_FROM` in Compose to change the sender. External SMTP requires Spring Mail credentials, authentication, and TLS settings.
 
 ---
 
@@ -592,7 +436,7 @@ Defaults: gateway `http://127.0.0.1:5000`, MailHog `http://127.0.0.1:8025`. Add 
 
 See the [smoke suite guide](docs/tests/system-smoke/README.md) for remote PowerShell setup, cleanup recovery, and offline runner verification.
 
-[Recorded results (12 October 2026)](docs/tests/system-smoke/DEPLOYMENT-REPORT.md): **two live runs passed, with 464/464 and 462/462 assertions**, including real AI screening and Kafka/MailHog email delivery; both had zero cleanup leftovers or uncertain mutations.
+[Recorded results](docs/tests/system-smoke/DEPLOYMENT-REPORT.md): **two live runs passed, with 464/464 and 462/462 assertions**, including real AI screening and Kafka/MailHog email delivery; both had zero cleanup leftovers or uncertain mutations.
 
 ### Cache Test
 
@@ -649,15 +493,9 @@ mvn -f job-portal-system/pom.xml test
 
 ## Configuration
 
-The **Config Server** is configured to pull service settings from:
+The Config Server reads service settings from `https://github.com/hduong02/job-portal-config`. To serve the checked-in `job-portal-config/` directory, change its Git URI or configure a native profile.
 
-```text
-https://github.com/hduong02/job-portal-config
-```
-
-A checked-in configuration directory is also available at `job-portal-config/`. The server does not automatically read that directory; update its Git URI or configure a native profile if you want to serve local files.
-
-Each service bootstraps with:
+Local services use an optional Config Server import:
 
 ```yaml
 spring:
@@ -665,9 +503,9 @@ spring:
     import: optional:configserver:http://localhost:8888
 ```
 
-`optional:` allows startup to continue when the Config Server is unavailable. Each service's local `application.yaml` includes its port and Eureka address; persistent services also include datasource and JPA defaults. These settings use the ports listed in [Services](#services) and can be overridden through environment variables. Set `SPRING_CLOUD_CONFIG_ENABLED=false` to skip Config Server entirely during local development. PostgreSQL, Eureka, and the infrastructure needed by each service must still be running, and AI requires `GEMINI_API_KEY`.
+If Config Server is unavailable, services use local `application.yaml` defaults. Set `SPRING_CLOUD_CONFIG_ENABLED=false` to skip it. Environment variables override local ports, datasource settings, and infrastructure addresses.
 
-The full Compose stack overrides most services to use the required import `configserver:http://config-server:8888` and provides container datasource URLs, Redis host, and Eureka address. The notification service retains an optional import.
+Full Compose uses the required import `configserver:http://config-server:8888` for most services and supplies container infrastructure addresses. The notification service retains an optional import.
 
 ---
 
