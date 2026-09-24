@@ -6,59 +6,26 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Architecture Overview](#architecture-overview)
-3. [Services](#services)
-4. [Data Flow](#data-flow)
-5. [Technology Stack](#technology-stack)
-6. [Design Patterns](#design-patterns)
-7. [Security](#security)
-8. [API Reference](#api-reference)
-9. [Running the Project](#running-the-project)
-10. [Tests](#tests)
-11. [Configuration](#configuration)
-12. [Known Limitations](#known-limitations)
-13. [UI Screenshots](#ui-screenshots)
+1. [Architecture Overview](#1-architecture-overview)
+2. [Features](#2-features)
+3. [Services](#3-services)
+4. [Data Flow](#4-data-flow)
+5. [Technology Stack](#5-technology-stack)
+6. [Design Patterns](#6-design-patterns)
+7. [Security](#7-security)
+8. [API Reference](#8-api-reference)
+9. [Running the Project](#9-running-the-project)
+10. [Tests](#10-tests)
+11. [Configuration](#11-configuration)
+12. [Known Limitations](#12-known-limitations)
+13. [UI Screenshots](#13-ui-screenshots)
+14. [Project Structure](#14-project-structure)
 
 ---
 
-## Features
+## 1. Architecture Overview
 
-### For Job Seekers (Candidate-Facing)
-
-- **Job Search** — Filter by keyword, category, skills, tags, company, location, salary, job type, work mode, experience level, status, and openings; paginate and sort results
-- **Resume Builder** — Manage personal information, education, work experience, skills, projects, and languages; choose a template, visibility, and default resume
-- **AI Resume Assistance** — Generate professional summaries and work experience bullet points
-- **Job Applications** — Apply with a resume, cover letter, expected salary, and availability date
-- **AI Application Assistance** — Generate cover letters and identify skills gaps
-- **Application Management** — View submitted applications and withdraw applications
-- **Saved Jobs** — Save and remove jobs from a personal shortlist
-- **Status Update Emails** — Receive HTML email updates when an employer changes an application's status
-- **Profile Management** — Maintain account and contact information
-
-### For Employers
-
-- **Company Profiles** — Create and manage company details and social links
-- **Job Management** — Create, edit, publish, close, and delete job postings
-- **Job Metadata** — Associate categories, skills, and tags with postings
-- **AI Job Assistance** — Generate job descriptions and suggest skills
-- **Applicant Management** — Review applications by job or company, filter candidates, star applications, and add notes
-- **Hiring Workflow** — Update statuses including reviewing, shortlisted, interview scheduled, rejected, and hired
-- **AI Candidate Screening** — Compare resumes against job requirements, with overall and component scores, matched/missing skills, strengths, and concerns
-
-### For System Administrators
-
-- **User Management** — Manage users and account status through the administration interface
-- **Company Moderation** — Verify or deactivate companies
-- **Job Metadata Management** — Maintain job categories, skills, and tags
-- **Centralized Configuration** — Service settings loaded from a Git-backed Config Server
-- **Service Discovery** — Eureka-based dynamic service registration
-
----
-
-## Architecture Overview
-
-![Job Portal system architecture](docs/architecture/architecture.png)
+![Job Portal system architecture](docs/architecture/job%20portal%20architecture.png)
 
 <details>
 <summary>Text architecture diagram</summary>
@@ -106,9 +73,43 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 
 ---
 
-## Services
+## 2. Features
 
-### Infrastructure Services
+### 2.1 For Job Seekers (Candidate-Facing)
+
+- **Job Search** — Filter by keyword, category, skills, tags, company, location, salary, job type, work mode, experience level, status, and openings; paginate and sort results
+- **Resume Builder** — Manage personal information, education, work experience, skills, projects, and languages; choose a template, visibility, and default resume
+- **AI Resume Assistance** — Generate professional summaries and work experience bullet points
+- **Job Applications** — Apply with a resume, cover letter, expected salary, and availability date
+- **AI Application Assistance** — Generate cover letters and identify skills gaps
+- **Application Management** — View submitted applications and withdraw applications
+- **Saved Jobs** — Save and remove jobs from a personal shortlist
+- **Status Update Emails** — Receive HTML email updates when an employer changes an application's status
+- **Profile Management** — Maintain account and contact information
+
+### 2.2 For Employers
+
+- **Company Profiles** — Create and manage company details and social links
+- **Job Management** — Create, edit, publish, close, and delete job postings
+- **Job Metadata** — Associate categories, skills, and tags with postings
+- **AI Job Assistance** — Generate job descriptions and suggest skills
+- **Applicant Management** — Review applications by job or company, filter candidates, star applications, and add notes
+- **Hiring Workflow** — Update statuses including reviewing, shortlisted, interview scheduled, rejected, and hired
+- **AI Candidate Screening** — Compare resumes against job requirements, with overall and component scores, matched/missing skills, strengths, and concerns
+
+### 2.3 For System Administrators
+
+- **User Management** — Manage users and account status through the administration interface
+- **Company Moderation** — Verify or deactivate companies
+- **Job Metadata Management** — Maintain job categories, skills, and tags
+- **Centralized Configuration** — Service settings loaded from a Git-backed Config Server
+- **Service Discovery** — Eureka-based dynamic service registration
+
+---
+
+## 3. Services
+
+### 3.1 Infrastructure Services
 
 | Service | Port | Role |
 |---|---|---|
@@ -120,7 +121,7 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 | **Redis** | 6379 | Cache for company and job lookups |
 | **MailHog** | SMTP 1025 / UI 8025 | Local email capture and preview |
 
-### Business Services
+### 3.2 Business Services
 
 | Service | Config Port | Database | Kafka | Responsibility |
 |---|---|---|---|---|
@@ -135,9 +136,9 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 
 ---
 
-## Data Flow
+## 4. Data Flow
 
-### Job Search
+### 4.1 Job Search
 
 ```text
 Client → API Gateway → job-portal-job-service
@@ -150,7 +151,7 @@ Client → API Gateway → job-portal-job-service
   └─ 5. Return Page<JobResponse>
 ```
 
-### Application & AI Screening
+### 4.2 Application & AI Screening
 
 ```text
 Client → API Gateway → job-portal-application-service
@@ -179,11 +180,9 @@ Employer → PATCH /api/applications/{id}/status
                        └─ Send HTML status update email → SMTP / MailHog
 ```
 
-AI shortlist categories are derived from the overall score: `AUTO_SHORTLISTED` (90+), `REVIEW_RECOMMENDED` (75–89), `PENDING_REVIEW` (50–74), and `LOW_MATCH` (below 50). They are stored separately from the employer-managed application status.
-
 ---
 
-## Technology Stack
+## 5. Technology Stack
 
 | Layer | Technologies | Purpose |
 |---|---|---|
@@ -201,9 +200,9 @@ Dependency versions are defined in the [backend POM](job-portal-system/pom.xml),
 
 ---
 
-## Design Patterns
+## 6. Design Patterns
 
-### Microservices Patterns
+### 6.1 Microservices Patterns
 
 | Pattern | Where Used |
 |---|---|
@@ -212,7 +211,7 @@ Dependency versions are defined in the [backend POM](job-portal-system/pom.xml),
 | **Config Server** | Service settings pulled from a Git repository on startup |
 | **Database per Service** | Separate PostgreSQL databases for users, companies, jobs, resumes, applications, and preferences |
 
-### Data Patterns
+### 6.2 Data Patterns
 
 | Pattern | Where Used |
 |---|---|
@@ -222,7 +221,7 @@ Dependency versions are defined in the [backend POM](job-portal-system/pom.xml),
 | **Cross-Service References** | IDs link applications to candidates, jobs, companies, and resumes |
 | **Cache-Aside** | Spring Cache annotations on job and company reads, with eviction on mutations |
 
-### Event-Driven Patterns
+### 6.3 Event-Driven Patterns
 
 | Pattern | Where Used |
 |---|---|
@@ -233,9 +232,9 @@ Dependency versions are defined in the [backend POM](job-portal-system/pom.xml),
 
 ---
 
-## Security
+## 7. Security
 
-### Roles
+### 7.1 Roles
 
 | Role | Application Responsibilities |
 |---|---|
@@ -243,9 +242,7 @@ Dependency versions are defined in the [backend POM](job-portal-system/pom.xml),
 | `ROLE_EMPLOYER` | Company profile, job postings, applicant review, hiring status updates |
 | `ROLE_JOB_SEEKER` | Job search, resumes, saved jobs, personal applications |
 
-Public signup accepts job seeker and employer accounts; self-registration as an administrator is rejected. Role-specific frontend views do not replace backend authorization checks. Log in after registration to obtain a token with populated role authorities; the current signup code creates its authentication object without granted authorities.
-
-### JWT Authentication Flow
+### 7.2 JWT Authentication Flow
 
 ```text
 1. POST /auth/login  { email, password }
@@ -269,9 +266,7 @@ Public signup accepts job seeker and employer accounts; self-registration as an 
    Services check ownership where implemented
 ```
 
-Tokens currently expire after 10 days. Signing and validation use `JwtConstant.SECRET_KEY` in the user service and gateway; `JWT_SECRET` is not read by the current code.
-
-### Endpoint Protection
+### 7.3 Endpoint Protection
 
 | Path | Current Gateway Access |
 |---|---|
@@ -284,7 +279,7 @@ Tokens currently expire after 10 days. Signing and validation use `JwtConstant.S
 
 ---
 
-## API Reference
+## 8. API Reference
 
 Send `Authorization: Bearer <token>` for protected endpoints.
 
@@ -298,13 +293,13 @@ Send `Authorization: Bearer <token>` for protected endpoints.
 | GET | `/api/applications/my` | List your applications |
 | PATCH | `/api/applications/{id}/status` | Update hiring status and trigger an email notification |
 
-See the [API examples](docs/api/README.md) for request payloads, search parameters, and response shapes. See [Security](#security) for gateway access rules.
+See the [API examples](docs/api/README.md) for request payloads, search parameters, and response shapes. See [Security](#7-security) for gateway access rules.
 
 ---
 
-## Running the Project
+## 9. Running the Project
 
-### Prerequisites
+### 9.1 Prerequisites
 
 - Java 25
 - Maven 3.9+
@@ -312,7 +307,7 @@ See the [API examples](docs/api/README.md) for request payloads, search paramete
 - Node.js compatible with Vite 8 and pnpm
 - A Gemini API key for AI features
 
-### Quick Start (Docker Compose)
+### 9.2 Quick Start (Docker Compose)
 
 Run from the repository root in PowerShell:
 
@@ -342,7 +337,7 @@ docker compose --env-file docker/.env -f docker/docker-compose.yml up -d
 
 The API is available at [http://localhost:5000](http://localhost:5000), Eureka at [http://localhost:8761](http://localhost:8761), and captured email at [http://localhost:8025](http://localhost:8025). Compose does not include the frontend.
 
-### Local Development (individual services)
+### 9.3 Local Development (individual services)
 
 ```powershell
 # Start local Kafka, Redis, and MailHog
@@ -374,7 +369,7 @@ Local Java processes do not load `docker/.env`; set environment variables in eac
 
 The frontend runs at [http://localhost:5173](http://localhost:5173) and defaults to gateway `http://localhost:5000`. For another gateway, copy `job-portal-frontend/.env.example` to `.env.local`, set `VITE_API_URL`, and restart the dev server. Set it before `pnpm build` for deployment.
 
-### Environment Variables
+### 9.4 Environment Variables
 
 ```env
 # Full Compose stack — database password
@@ -402,11 +397,11 @@ Compose uses SMTP `mailhog:1025`; set `APP_MAIL_FROM` in Compose to change the s
 
 ---
 
-## Tests
+## 10. Tests
 
 Start the backend and required infrastructure, then run the smoke suite before cache or stress testing. The smoke suite creates its own fixtures; seed mock data for cache and stress tests. Run the commands below from the repository root in PowerShell unless noted otherwise.
 
-### Populate Mock Data Before Testing
+### 10.1 Populate Mock Data Before Testing
 
 The recorded VPS was seeded in two stages:
 
@@ -422,11 +417,11 @@ python3 /root/seed-vps-shortlist.py
 
 These scripts insert directly into PostgreSQL without AI screening, Kafka events, or emails. They depend on the recorded VPS schema, container names, and dataset. Keep backups and manifests: use `--verify-only` for an existing general seed or `--resume` for recovery. Shortlist reruns do not reset statuses. See the [general](docs/vps/seeding/vps-scale-seeding.md) and [shortlist](docs/vps/seeding/vps-shortlist-seeding.md) seeding reports for details.
 
-### Smoke Test
+### 10.2 Smoke Test
 
 Runs a sequential recruitment journey through the gateway: accounts, company/job setup, resumes, search, saved jobs, applications, real Gemini generation/screening, Kafka/MailHog email delivery, and authorization checks. Requires an active admin account, working Gemini and notification services, and Node.js 22+ or Docker.
 
-Run on the VPS (prompts for admin credentials and a disposable-account password):
+Run on the VPS:
 
 ```bash
 bash docs/tests/system-smoke/run-vps.sh
@@ -438,7 +433,7 @@ See the [smoke suite guide](docs/tests/system-smoke/README.md) for remote PowerS
 
 [Recorded results](docs/tests/system-smoke/DEPLOYMENT-REPORT.md): **two live runs passed, with 464/464 and 462/462 assertions**, including real AI screening and Kafka/MailHog email delivery; both had zero cleanup leftovers or uncertain mutations.
 
-### Cache Test
+### 10.3 Cache Test
 
 Measures company and job detail reads, first across up to 1,000 distinct IDs, then repeated reads for 20 seconds. The recorded controlled run targeted **150 RPS per phase**. Checks response IDs and unchanged payloads.
 
@@ -459,13 +454,9 @@ node 'docs/tests/cache-performance/cache-performance.cjs'
 
 Warmed company reads reduced **p50 by 1.26%, p95 by 36.65%, and p99 by 55.76%**; warmed job reads reduced **p50 by 17.79%, p95 by 50.57%, and p99 by 49.92%**. Across **8,000 measured requests** (1,000 cold and 3,000 warm per endpoint), there were **0 response/correctness errors** and **0 dropped arrivals**. Percentages compare end-to-end cold and warm timings using `(cold − warm) / cold × 100`, calculated from unrounded measurements.
 
-The recorded run used `https://api.jobportal.tech`, with selected Redis keys verified absent before cold reads and present after cold and warm reads. These are observed deployment latency reductions; phase duration, network effects, concurrent traffic, and the warm company cache used by job enrichment limit causal comparisons.
-
-### Stress Test
+### 10.4 Stress Test
 
 Updates distinct seeded applications from `PENDING` to `SHORTLISTED` and checks the Kafka/MailHog pipeline. k6 ramps through **5–320 virtual users**, with a 10-second ramp and 30-second hold per level (**280 seconds**). Thresholds: **p95 <500 ms, p99 <1,000 ms, success >99.9%**.
-
-The recorded run used Windows k6 through four pinned SSH connections to the VPS loopback gateway; timings include SSH/network overhead. Each row measures a 30-second hold, excluding ramps and including requests that finish after the hold.
 
 [Recorded results](docs/tests/shortlist-stress/ramping-vus.md) and [run data](docs/tests/shortlist-stress/ramping-vus.json):
 
@@ -479,11 +470,11 @@ The recorded run used Windows k6 through four pinned SSH connections to the VPS 
 | 160 | 332.97 | 702.14 ms | 775.52 ms | Fail |
 | 320 | 320.37 | 1,391.70 ms | 1,675.26 ms | Fail |
 
-Highest passing throughput: **356.23 RPS at 80 users**, with **p95 342.64 ms** and **p99 423.99 ms**. The full **280-second profile** completed; all **68,826 requests** succeeded, with **0 failures, timeouts, or server 5xx responses**. After notification drain, aggregate counts matched at **68,826 database updates, Kafka events, and captured emails**, and final Kafka lag was **0**. This reconciliation checks aggregate counts; individual message delivery was not audited. The 160- and 320-user holds failed latency thresholds, causing k6 to exit **99**. The stress report provides p95 and p99 per hold, without a before/after comparison or p50 results from which to calculate reductions.
+Highest passing throughput: **356.23 RPS at 80 users**, with **p95 342.64 ms** and **p99 423.99 ms**. The full **280-second profile** completed; all **68,826 requests** succeeded, with **0 failures, timeouts, or server 5xx responses**. After notification drain, aggregate counts matched at **68,826 database updates, Kafka events, and captured emails**, and final Kafka lag was **0**. 
 
 The [preserved scripts](docs/tests/shortlist-stress/scripts/) require the setup in the report, private employer credentials, new artifact directories, and enough pending fixtures. Kafka, notification-service, and MailHog must be running.
 
-### Unit and Controller Tests
+### 10.5 Unit and Controller Tests
 
 ```powershell
 mvn -f job-portal-system/pom.xml test
@@ -491,7 +482,7 @@ mvn -f job-portal-system/pom.xml test
 
 ---
 
-## Configuration
+## 11. Configuration
 
 The Config Server reads service settings from `https://github.com/hduong02/job-portal-config`. To serve the checked-in `job-portal-config/` directory, change its Git URI or configure a native profile.
 
@@ -509,7 +500,7 @@ Full Compose uses the required import `configserver:http://config-server:8888` f
 
 ---
 
-## Known Limitations
+## 12. Known Limitations
 
 | Limitation | Impact | Workaround |
 |---|---|---|
@@ -520,23 +511,23 @@ Full Compose uses the required import `configserver:http://config-server:8888` f
 
 ---
 
-## UI Screenshots
+## 13. UI Screenshots
 
-### Job Seeker
+### 13.1 Job Seeker
 
 ![Job seeker interface](docs/images/job%20seeker.PNG)
 
-### Employer
+### 13.2 Employer
 
 ![Employer interface](docs/images/employer.PNG)
 
-### Admin
+### 13.3 Admin
 
 ![Admin interface](docs/images/admin.PNG)
 
 ---
 
-## Project Structure
+## 14. Project Structure
 
 ```text
 Job Portal System/

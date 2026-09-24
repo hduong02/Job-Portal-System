@@ -207,7 +207,7 @@ services:
       - job-portal-net
 
   gateway:
-    image: andyy02/job-portal-api-gateway@sha256:f5447bda6b6de0f69acefda73cfd9d6eea7604811f4e30fff26372d761dafbfe
+    image: andyy02/job-portal-api-gateway@sha256:1022e20f62bfd52d7ca85efc75ec3106434f9acf585aa926d71e31a8c234c9a4
     container_name: job-portal-gateway
     mem_limit: 512m
     mem_reservation: 256m
