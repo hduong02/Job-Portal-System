@@ -399,6 +399,8 @@ Compose uses SMTP `mailhog:1025`; set `APP_MAIL_FROM` in Compose to change the s
 
 ## 10. Tests
 
+The recorded tests were run on a machine with a **2-core CPU and 8 GB of RAM**.
+
 Start the backend and required infrastructure, then run the smoke suite before cache or stress testing. The smoke suite creates its own fixtures; seed mock data for cache and stress tests. Run the commands below from the repository root in PowerShell unless noted otherwise.
 
 ### 10.1 Populate Mock Data Before Testing
@@ -484,19 +486,21 @@ mvn -f job-portal-system/pom.xml test
 
 ## 11. Configuration
 
-The Config Server reads service settings from `https://github.com/hduong02/job-portal-config`. To serve the checked-in `job-portal-config/` directory, change its Git URI or configure a native profile.
+All service configuration is managed by the **Config Server** which pulls from:
 
-Local services use an optional Config Server import:
+```text
+<https://github.com/hduong02/job-portal-config>
+```
+
+Each service bootstraps with:
 
 ```yaml
 spring:
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:<http://localhost:8888>
 ```
 
-If Config Server is unavailable, services use local `application.yaml` defaults. Set `SPRING_CLOUD_CONFIG_ENABLED=false` to skip it. Environment variables override local ports, datasource settings, and infrastructure addresses.
-
-Full Compose uses the required import `configserver:http://config-server:8888` for most services and supplies container infrastructure addresses. The notification service retains an optional import.
+`optional:` means if the Config Server is unavailable, the service falls back to its local `application.yaml`.
 
 ---
 
