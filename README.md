@@ -102,8 +102,6 @@ An **AI-assisted Job Portal System** built with Spring Boot microservices, a Rea
 - **User Management** — Manage users and account status through the administration interface
 - **Company Moderation** — Verify or deactivate companies
 - **Job Metadata Management** — Maintain job categories, skills, and tags
-- **Centralized Configuration** — Service settings loaded from a Git-backed Config Server
-- **Service Discovery** — Eureka-based dynamic service registration
 
 ---
 
@@ -506,12 +504,12 @@ spring:
 
 ## 12. Known Limitations
 
-| Limitation | Impact | Workaround |
+| Limitation | Impact | Current mitigation / Future improvement |
 |---|---|---|
-| AI screening is asynchronous and provider-dependent | Initial application responses may lack scores; provider failures leave screening incomplete | Inspect application-service and AI-service logs; retry screening through a trusted service connection |
-| Status updates and Kafka publishing are separate operations | Publisher failures can leave a saved status without a notification event | Add durable event delivery, such as an outbox, and monitor failures |
-| Kafka is a single broker | No broker redundancy in local Compose | Use a replicated broker deployment when required |
-| Job response enrichment calls company-service per job | Search latency depends on company-service and page size | Keep pages bounded and use the existing company cache |
+| Status updates and Kafka publishing are separate operations, and asynchronous send results are not observed | A status can be saved without a notification event; send failures reported asynchronously are not handled by the publisher's exception handler | Current: inspect publisher and Kafka logs. Future: add a transactional outbox with retries and delivery monitoring |
+| AI screening runs asynchronously in memory without durable execution, automatic recovery, or a persisted failure state | Initial responses may lack scores; service restarts or dependency failures can leave screening incomplete, and missing scores do not distinguish pending from failed work | Current: inspect application-service and AI-service logs; retry screening through a trusted service connection. Future: persist screening state and work, with bounded retries and recovery after restarts |
+| Job response enrichment calls company-service once per returned job | Search latency and inter-service traffic grow with page size; company caching reduces database work but does not remove these requests | Current: keep pages bounded and use the existing company cache. Future: deduplicate company IDs per page and fetch company details in batches |
+| The Compose deployment uses a single Kafka broker | No broker redundancy; broker downtime interrupts event delivery | Future: use a replicated broker deployment when availability requirements demand it |
 
 ---
 
